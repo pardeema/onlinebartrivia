@@ -1,0 +1,7 @@
+<h1>Game: {{ game.password }} </h1>
+<ul>
+{%for round in rounds %}
+
+		<li><a href={%url 'round' game.password round.round_num %}>Round {{ round.round_num }}</a></li>
+{%endfor%}
+</ul>
