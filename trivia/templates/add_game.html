@@ -1,0 +1,12 @@
+Code to add game here
+
+
+<form method="POST">
+	{% csrf_token %}
+	<label for="g_id">Game ID</label><br>
+	<input type="text" placeholder = "Game ID" id="g_id" name="g_id"><br>
+	<label for="date">Game Date<label><br>
+	<input type="date" id="date" name="date"><br>
+	<input type="submit" value="Submit">
+	
+</form>
