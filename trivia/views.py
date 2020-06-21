@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 from .models import *
 
 def index(request):
@@ -22,3 +23,12 @@ def round(request, game_id, round_num):
     
     context = {'game': game, 'round': round, 'questions': questions}
     return render(request, 'round.html', context)
+
+def add_round(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    
+    if request.method == 'POST':
+        #Do stuff
+        return HttpResponseRedirect(reverse('game', args=(game_id,) ))
+    else:
+        return render(request, 'add_round.html', {'game':game})
