@@ -38,6 +38,7 @@ class Team(models.Model):
 class Team_Answer(models.Model):
     answer = models.CharField(max_length=255)
     correct = models.BooleanField(default=False)
+    scored = models.BooleanField(default = False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete = models.CASCADE)
     def __str__(self):
