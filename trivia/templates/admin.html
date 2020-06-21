@@ -3,14 +3,17 @@
 <h2>Games</h2>
 
 {% for game in games %}
-	<p>Game ID: <a href="{% url 'game_details' game.password %}">{{game.password}}</a></p>
-	<p>Game Date: {{game.date}} </p>
-	<p>Status: {% if game.active %} 
+	<p><b>Game ID:</b> <a href="{% url 'game_details' game.password %}">{{game.password}}</a></p>
+	<p><b>Game Date:</b> {{game.date}} </p>
+	<p><b>Status:</b> {% if game.active %} 
 					Active 
 					<a href="{% url 'toggle_game' game.password  %}">Disable Game</a>
 				{% else %} 
 					Inactive
 					<a href="{% url 'toggle_game' game.password %}">Enable Game</a>
 				{%endif%}</p>
-	
+	<hr>
 {% endfor %}
+
+<br><br>
+<a href="{% url 'add_game' %}">Add a game</a>
