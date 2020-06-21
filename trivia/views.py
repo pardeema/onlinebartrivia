@@ -21,4 +21,4 @@ def round(request, game_id, round_num):
     questions = Question.objects.filter(round = round)
     
     context = {'game': game, 'round': round, 'questions': questions}
-    return HttpResponse("Test")
+    return render(request, 'round.html', context)
