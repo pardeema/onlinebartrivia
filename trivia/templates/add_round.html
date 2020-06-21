@@ -1,8 +1,23 @@
 Code to add round here.
+<!-- TODO Add code to view existing round -->
 
 
 <form method="POST">
 	{% csrf_token %}
-	<input type="text" placeholder="test" name="test"><br>
+	<label for="name">Round Name</label><br>
+	<input type="text" placeholder = "Round Name" id="name" name="name"><br>
+	<label for="round_num">Round Number<label><br>
+	<input type="integer" id="round_num" name="round_num"><br>
+
+	{% for i in "12345678" %}
+		<label for="q{{i}}">Question {{i}}</label><span>
+		<label for="a{{i}}">Answer {{i}}<label><br>
+		<input type="text" placeholder="Question" id="q{{i}}" 
+					name="q{{i}}"><span>
+		<input type="text" placeholder="Answer" id="a{{i}}" 
+					name="a{{i}}"><br>
+		
+	{% endfor %}
 	<input type="submit" value="submit">
+	
 </form>

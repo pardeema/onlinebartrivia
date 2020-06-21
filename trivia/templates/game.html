@@ -2,6 +2,8 @@
 <ul>
 {%for round in rounds %}
 
-		<li><a href={%url 'round' game.password round.round_num %}>Round {{ round.round_num }}</a></li>
+		<li><a href="{%url 'round' game.password round.round_num %}">Round {{ round.round_num }}</a></li>
 {%endfor%}
 </ul>
+<br><br>
+<a href="{%url 'add_round' game.password %}">Add Round</a>
