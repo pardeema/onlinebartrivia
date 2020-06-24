@@ -55,7 +55,7 @@ def round(request, game_id, round_num):
 
     if request.session.get("{}".format(round.round_num), False):
         team = Team.objects.get(name=request.session['team_name'], game=game)
-        context['team_answers'] = [Team_Answer.objects.get(team=team, question=q) for q in questions]
+        context['team_answers'] = [T_Answer.objects.get(team=team, question=q) for q in questions]
 
     return render(request, 'round.html', context)
 
@@ -66,7 +66,7 @@ def submit_answers(request, game_id, round_num):
     team = Team(name =request.session.get('team_name'), game=game )
     team.save()
     for question in questions:
-        answer = Team_Answer(answer = request.POST['a{}'.format(question.question_num)],
+        answer = T_Answer(answer = request.POST['a{}'.format(question.question_num)],
                                 question = question, team=team)
         answer.save()
     
@@ -169,6 +169,11 @@ def admin_score(request, game_id, round_num):
     context={}
     for team in teams:
         questions = Question.objects.filter(round=round)
-        ta = {team.name: [Team_Answer(question=q, team=team) for q in questions]}
-        context.setdefault('team_answers', []).append(ta)
+        try:
+            ta = {team.name: [T_Answer.objects.get(question=q, team=team) for q in questions]}
+            context.setdefault('team_answers', []).append(ta)
+        except:
+            continue
+
+        
     return render(request, "admin/score.html", context)

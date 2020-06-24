@@ -4,7 +4,7 @@ from datetime import date
 class Game(models.Model):
     date = models.DateField(default=date.today())
     name = models.CharField(max_length=140)
-    password = models.CharField(max_length=6)
+    password = models.CharField(max_length=6, unique=True)
     active = models.BooleanField(default=False)
     
     def __str__(self):
@@ -40,7 +40,7 @@ class Team(models.Model):
     def __str__(self):
         return self.name
     
-class Team_Answer(models.Model):
+class T_Answer(models.Model):
     answer = models.CharField(max_length=255)
     correct = models.BooleanField(default=False)
     scored = models.BooleanField(default = False)
@@ -50,5 +50,3 @@ class Team_Answer(models.Model):
         return "{} answer for Q {}, Round {}, Game {}, answer {}".format(self.team.name, 
             self.question.question_num, self.question.round.round_num, 
             self.question.round.game.password, self.answer)
-    def get_answer(self):
-        return self.answer

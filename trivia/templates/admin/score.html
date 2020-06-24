@@ -1,10 +1,18 @@
 {% for team in team_answers %}
-    Team is:      {{team}}<br><br><br>
+    {%for name in team%}
+        <h2>{{name}}</h2>
+    {%endfor%}
     {%for answers in team.values%}
-       Answers is:    {{answers}}<br><br><br>
         {%for a in answers%}
-           Answer.answer is:  {{answers}}<br><br><br><br><br>
+             {% if not a.scored %}
+                <b>Question: {{a.question.question}}</b><br>
+                <i>Submitted | Answer Key </i><br>
+                {{a.answer}}  |<span>{{a.question.answer}} <br>
+                <!--TODO: Add JS to hide names of scored teams -->
+            {%endif%}
         {%endfor%}
+        <hr><br>
     {% endfor%}
 
 {%endfor%}
+
