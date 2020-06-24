@@ -77,3 +77,15 @@ def toggle_game(request, game_id):
         game.active = True
     game.save()
     return HttpResponseRedirect(reverse('admin'))
+
+@login_required
+@permission_required('is_superuser')
+def toggle_round(request, game_id, round_num):
+    game = get_object_or_404(Game, password=game_id)
+    round  = Round.objects.get(game=game, round_num=round_num)
+    if round.active:
+        round.active = False
+    else:
+        round.active = True
+    round.save()
+    return HttpResponseRedirect(reverse('game_details', args=(game_id,)))
