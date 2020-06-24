@@ -1,13 +1,33 @@
 <h1>Game: {{ game.password }} </h1>
 <h2>Team: {{request.session.team_name}}</h2>
+{% if team_answers %}
+<h2>{{round.round_name}}</h2>
+	<h3>You have already submitted answers for this round</h3>
+	<form>
+		{%for answer in team_answers %}
+				<b>Question #{{answer.question.question_num}}:</b> {{answer.question.question}}<br>
+				<label for="a{{answer.question.question_num}}">Your Answer: </label>
+				<input type="text" name="a{{answer.question.question_num}}" value="{{answer.answer}}" readonly><br>
+		{%endfor%}
+	</form>
 
-{% if round.active %}
+{% elif round.active %}
 	<h2>{{ round.round_name }} </h2>
-	<ul>
-	{%for question in questions %}
-			<li>Question #{{question.question_num}} - {{question.question}}</a></li>
-	{%endfor%}
-	</ul>
+
+	<form action="{% url 'submit_answers' game.password round.round_num%}" method="POST">
+		{% csrf_token %}
+		{%for question in questions %}
+				<b>Question #{{question.question_num}}:</b> {{question.question}}<br>
+				<label for="a{{question.question_num}}">Answer: </label>
+				<input type="text" name="a{{question.question_num}}" placeholder="Enter Answer"><br>
+		{%endfor%}
+		<input type="checkbox" value="yes" name="double" id="double">
+		<label for="double">2X Multiplier?<label>
+		<br><br><label for="check">I'm sure I want to submit</label>
+		<input type="checkbox" required="true" name='check' id="check"><br>
+		<input type="submit" value="Submit">
+	</form>
+
 {% else %}
 This round is not active. Check back after the Quizmaster has annouced it is active.
 
