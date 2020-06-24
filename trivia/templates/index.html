@@ -4,9 +4,9 @@
 
 {% for game in games %}
 	{% if game.active %}
-		<p>Game ID: <a href="{% url 'index' %}>{{game.password}}"</a></p>
+		<p><b>Game Name:</b> {{game.name}}</p>
 		<p>Game Date: {{game.date}} </p>
-		<p>Status: {% if game.active %} Active {% else %} Inactive 
+		<p>Status: <a href="{% url 'join_game' %}">Join Now!</a> 
 	{%endif%}
 	
 {% endfor %}

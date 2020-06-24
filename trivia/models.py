@@ -16,6 +16,9 @@ class Round(models.Model):
     active = models.BooleanField(default=False)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     
+    class Meta:
+        ordering = ['round_num']
+
     def __str__(self):
         return "Round {}: {}".format(self.round_num, self.round_name)
    
