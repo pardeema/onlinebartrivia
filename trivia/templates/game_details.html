@@ -2,7 +2,15 @@
 <ul>
 {%for round in rounds %}
 
-		<li><a href="{%url 'round' game.password round.round_num %}">Round {{ round.round_num }}</a></li>
+		<li><a href="{%url 'round' game.password round.round_num %}">Round {{ round.round_num }}</a><span>
+		<p><b>Status:</b> {% if round.active %} 
+					Active 
+					<a href="{% url 'toggle_round' game.password  round.round_num%}">Disable Round</a>
+				{% else %} 
+					Inactive
+					<a href="{% url 'toggle_round' game.password round.round_num %}">Enable Round</a>
+				{%endif%}</p></li>
+
 {%endfor%}
 </ul>
 <br><br>
