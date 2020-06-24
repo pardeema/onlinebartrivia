@@ -51,9 +51,32 @@ def round(request, game_id, round_num):
     game = get_object_or_404(Game, password=game_id)
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
-    
     context = {'game': game, 'round': round, 'questions': questions}
+
+    if request.session.get("{}".format(round.round_num), False):
+        team = Team.objects.get(name=request.session['team_name'], game=game)
+        context['team_answers'] = [Team_Answer.objects.get(team=team, question=q) for q in questions]
+
     return render(request, 'round.html', context)
+
+def submit_answers(request, game_id, round_num):
+    game = get_object_or_404(Game, password=game_id)
+    round  = Round.objects.get(game=game, round_num=round_num)
+    questions = Question.objects.filter(round = round)
+    team = Team(name =request.session.get('team_name'), game=game )
+    team.save()
+    for question in questions:
+        answer = Team_Answer(answer = request.POST['a{}'.format(question.question_num)],
+                                question = question, team=team)
+        answer.save()
+    
+    if request.POST.get('double'):
+        team.double_round = round.round_num
+        team.save()
+        request.session['double']=round.round_num
+    
+    request.session["{}".format(round.round_num)] = True
+    return HttpResponseRedirect(reverse('game', args=(game_id,)))
 
 #Below are ADMIN views
 @login_required

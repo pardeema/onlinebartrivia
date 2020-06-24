@@ -8,6 +8,7 @@ urlpatterns = [
     path('game/<str:game_id>/', views.game_home, name='game'),
     path('game/<str:game_id>/round/<int:round_num>/', views.round, name='round'),
     path('game/<str:game_id>/set_team', views.set_team, name='set_team'),
+    path('game/<str:game_id>/round/<int:round_num>/submit', views.submit_answers, name='submit_answers'),
     path('admin/', include([
         path('', views.admin, name='admin'),
         path('add_game/', views.add_game, name='add_game'),
