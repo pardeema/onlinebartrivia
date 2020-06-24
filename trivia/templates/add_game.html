@@ -3,8 +3,10 @@ Code to add game here
 
 <form method="POST">
 	{% csrf_token %}
-	<label for="g_id">Game ID</label><br>
-	<input type="text" placeholder = "Game ID" id="g_id" name="g_id"><br>
+	<label for="name">Game Name</label><br>
+	<input type="text" default="Friends Trivia!" id="name" name="name"><br>
+	<label for="g_id">Game Passwrd</label><br>
+	<input type="text" placeholder = "Game Password" id="g_id" name="g_id"><br>
 	<label for="date">Game Date<label><br>
 	<input type="date" id="date" name="date"><br>
 	<input type="submit" value="Submit">

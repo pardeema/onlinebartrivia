@@ -61,7 +61,7 @@ def add_round(request, game_id):
 @permission_required('is_superuser')
 def add_game(request):
     if request.method == 'POST':
-        g = Game(password=request.POST['g_id'], date=request.POST['date'])
+        g = Game(name=request.POST['name'], password=request.POST['g_id'], date=request.POST['date'])
         g.save()
         return HttpResponseRedirect(reverse('admin'))
     else:

@@ -3,8 +3,10 @@
 <h2>Games</h2>
 
 {% for game in games %}
-	<p>Game ID: <a href={% url 'index' %}>{{game.password}}</a></p>
-	<p>Game Date: {{game.date}} </p>
-	<p>Status: {% if game.active %} Active {% else %} Inactive {%endif%}</p>
+	{% if game.active %}
+		<p>Game ID: <a href="{% url 'index' %}>{{game.password}}"</a></p>
+		<p>Game Date: {{game.date}} </p>
+		<p>Status: {% if game.active %} Active {% else %} Inactive 
+	{%endif%}
 	
 {% endfor %}
