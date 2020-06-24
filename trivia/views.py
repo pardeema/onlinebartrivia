@@ -28,10 +28,32 @@ def join_game(request):
     return render(request, 'join.html', {'error': error})
 
 def game_home(request, game_id):
+    if request.session.get('team_name', False):
+        game = get_object_or_404(Game, password = game_id)
+        rounds = Round.objects.filter(game = game)
+        context = {'game':game, 'rounds':rounds}
+        return render(request, 'game.html', context)
+    else:
+        return HttpResponseRedirect(reverse('set_team', args=(game_id,)))
+
+def set_team(request, game_id):
     game = get_object_or_404(Game, password = game_id)
-    rounds = Round.objects.filter(game = game)
-    context = {'game':game, 'rounds':rounds}
-    return render(request, 'game.html', context)
+    
+    if request.session.get('team_name', False):
+        return HttpResponseRedirect(reverse('game', args=(game.password,)))
+    elif request.method == 'POST':
+        request.session['team_name'] = request.POST['team_name']
+        return HttpResponseRedirect(reverse('game', args=(game.password,)))
+    else:
+        return render(request, 'register_team.html')
+        
+def round(request, game_id, round_num):
+    game = get_object_or_404(Game, password=game_id)
+    round  = Round.objects.get(game=game, round_num=round_num)
+    questions = Question.objects.filter(round = round)
+    
+    context = {'game': game, 'round': round, 'questions': questions}
+    return render(request, 'round.html', context)
 
 #Below are ADMIN views
 @login_required
@@ -52,7 +74,7 @@ def game_details(request, game_id):
 
 @login_required
 @permission_required('is_superuser')    
-def round(request, game_id, round_num):
+def admin_round(request, game_id, round_num):
     game = get_object_or_404(Game, password=game_id)
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)

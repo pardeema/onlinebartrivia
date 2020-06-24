@@ -1,0 +1,14 @@
+<h1>Game: {{ game.password }} </h1>
+<h2>Team: {{request.session.team_name}}</h2>
+
+{% if round.active %}
+	<h2>{{ round.round_name }} </h2>
+	<ul>
+	{%for question in questions %}
+			<li>Question #{{question.question_num}} - {{question.question}}</a></li>
+	{%endfor%}
+	</ul>
+{% else %}
+This round is not active. Check back after the Quizmaster has annouced it is active.
+
+{% endif %}
