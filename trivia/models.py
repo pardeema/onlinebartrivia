@@ -3,6 +3,7 @@ from datetime import date
 
 class Game(models.Model):
     date = models.DateField(default=date.today())
+    name = models.CharField(max_length=140)
     password = models.CharField(max_length=6)
     active = models.BooleanField(default=False)
     
@@ -15,6 +16,9 @@ class Round(models.Model):
     active = models.BooleanField(default=False)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     
+    class Meta:
+        ordering = ['round_num']
+
     def __str__(self):
         return "Round {}: {}".format(self.round_num, self.round_name)
    
@@ -31,7 +35,8 @@ class Team(models.Model):
     name = models.CharField(max_length=140)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
-    
+    double_round = models.IntegerField(default=0)
+
     def __str__(self):
         return self.name
     

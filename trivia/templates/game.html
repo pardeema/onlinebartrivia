@@ -1,0 +1,14 @@
+<h1>Game: {{ game.password }} </h1>
+<h2>Welcome, Team: {{request.session.team_name}}</h2>
+<ul>
+{%for round in rounds %}
+
+		<li><a href="{%url 'round' game.password round.round_num %}">Round {{ round.round_num }}</a><span>
+		<b>Status:</b> {% if round.active %} 
+					Active 
+				{% else %} 
+					Inactive
+				{%endif%}</li>
+
+{%endfor%}
+</ul>
