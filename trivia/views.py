@@ -159,3 +159,16 @@ def toggle_round(request, game_id, round_num):
         round.active = True
     round.save()
     return HttpResponseRedirect(reverse('game_details', args=(game_id,)))
+
+@login_required
+@permission_required('is_superuser')
+def admin_score(request, game_id, round_num):
+    game = get_object_or_404(Game, password=game_id)
+    round  = Round.objects.get(game=game, round_num=round_num)
+    teams = Team.objects.filter(game=game)
+    context={}
+    for team in teams:
+        questions = Question.objects.filter(round=round)
+        ta = {team.name: [Team_Answer(question=q, team=team) for q in questions]}
+        context.setdefault('team_answers', []).append(ta)
+    return render(request, "admin/score.html", context)

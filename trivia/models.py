@@ -47,5 +47,8 @@ class Team_Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete = models.CASCADE)
     def __str__(self):
-        return "{} answer for Q {}, Round {}, Game {}".format(self.team.name, self.question.question_num, self.question.round.round_num, self.question.round.game.password)
-    
+        return "{} answer for Q {}, Round {}, Game {}, answer {}".format(self.team.name, 
+            self.question.question_num, self.question.round.round_num, 
+            self.question.round.game.password, self.answer)
+    def get_answer(self):
+        return self.answer

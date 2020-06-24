@@ -1,0 +1,10 @@
+{% for team in team_answers %}
+    Team is:      {{team}}<br><br><br>
+    {%for answers in team.values%}
+       Answers is:    {{answers}}<br><br><br>
+        {%for a in answers%}
+           Answer.answer is:  {{answers}}<br><br><br><br><br>
+        {%endfor%}
+    {% endfor%}
+
+{%endfor%}
