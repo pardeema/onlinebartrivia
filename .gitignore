@@ -9,3 +9,4 @@ polls/__pycache__/__init__.cpython-37.pyc
 polls/__pycache__/urls.cpython-37.pyc
 polls/__pycache__/views.cpython-37.pyc
 polls/migrations/__init__.py
+db.sqlite3
