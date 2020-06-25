@@ -1,6 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <form method="POST">
     {% csrf_token %}
     <b><label for="team_name">Enter your team name:</label></b><br>
     <input type="text" name="team_name" placeholder="Enter Team Name">
     <input type="submit" value="Submit">
 </form>
+
+{% endblock content %}

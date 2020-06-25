@@ -1,6 +1,6 @@
-Code to add round here.
-<!-- TODO Add code to view existing round -->
+{% extends "base.html" %}
 
+{% block content %}
 
 <form method="POST">
 	{% csrf_token %}
@@ -21,3 +21,4 @@ Code to add round here.
 	<input type="submit" value="submit">
 	
 </form>
+{% endblock content %}

@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <h1>Game: {{ game.password }} </h1>
 <h2>{{ round.round_name }} </h2>
 <ul>
@@ -5,3 +9,4 @@
 		<li>Question #{{question.question_num}} - {{question.question}}</a></li>
 {%endfor%}
 </ul>
+{% endblock content %}

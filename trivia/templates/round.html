@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <h1>Game: {{ game.password }} </h1>
 <h2>Team: {{request.session.team_name}}</h2>
 
@@ -33,3 +37,4 @@
 This round is not active. Check back after the Quizmaster has annouced it is active.
 
 {% endif %}
+{% endblock content %}
