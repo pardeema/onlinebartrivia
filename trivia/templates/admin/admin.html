@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
 
 {% block content %}
 
@@ -6,20 +11,25 @@
 
 <h2>Games</h2>
 
-{% for game in games %}
-	<p><b>Game Name: </b>{{game.name}}</p>
-	<p><b>Game Password:</b> <a href="{% url 'game_details' game.password %}">{{game.password}}</a></p>
-	<p><b>Game Date:</b> {{game.date}} </p>
-	<p><b>Status:</b> {% if game.active %} 
-					Active 
-					<a href="{% url 'toggle_game' game.password  %}">Disable Game</a>
-				{% else %} 
-					Inactive
-					<a href="{% url 'toggle_game' game.password %}">Enable Game</a>
-				{%endif%}</p>
-	<hr>
-{% endfor %}
+<div class="row">
+	<div class="col"> 
+		<a href="{%url 'add_game' %}"><button class="btn btn-success">Add a Game</button></a>
+	</div>
+</div><br>
 
-<br><br>
-<a href="{% url 'add_game' %}">Add a game</a>
+{% for game in games|dictsortreversed:'date' %}
+	<div class="card" style="width: 18rem;">
+		<ul class="list-group list-group-flush">
+			<li class="list-group-item"><b>{{game.name}}</b>   <a href="{% url 'game_details' game.password %}"><button class="btn btn-primary btn-sm float-right">Details</button></a></li>
+			<li class="list-group-item"><b>Game Password:</b>  <button class="btn btn-light float-right"><b>{{game.password}}</b></button></li>
+			<li class="list-group-item"><b>Game Date:</b> {{game.date}} </li>
+			{% if game.active %} 
+				<li class="list-group item"> <a href="{% url 'toggle_game' game.password  %}"><button class="btn btn-success btn-block">Active</button></a></li>
+			{% else %} 
+				<li class="list-group item"> <a href="{% url 'toggle_game' game.password  %}"><button class="btn btn-secondary btn-block">Inactive</button></a></li>
+			{%endif%}</li>
+		</ul>
+	</div>
+	<br><br>
+{% endfor %}
 {% endblock content %}

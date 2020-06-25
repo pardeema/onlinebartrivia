@@ -173,7 +173,7 @@ def admin_score(request, game_id, round_num):
     round  = Round.objects.get(game=game, round_num=round_num)
     teams = Team.objects.filter(game=game)
     questions = Question.objects.filter(round=round)
-    context={}
+    context={'round': round, 'game':game}
     
     if request.method=='POST':
         #Get team we're scoring and current score
@@ -189,7 +189,7 @@ def admin_score(request, game_id, round_num):
                 ta.correct = True
             ta.scored = True
             ta.save()
-            #If round_num == team.double_round, 2X score
+        #If round_num == team.double_round, 2X score
         if round_num == team.double_round:
             score = score * 2
         team.score = score
@@ -208,6 +208,6 @@ def admin_score(request, game_id, round_num):
 def scoreboard(request, game_id):
     game = get_object_or_404(Game, password=game_id)
     teams = Team.objects.filter(game=game)
-    context = {"teams": teams}
+    context = {"teams": teams, 'game':game}
 
     return render(request, "admin/scoreboard.html", context)

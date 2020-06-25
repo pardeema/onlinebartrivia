@@ -1,16 +1,25 @@
 {% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
 
 {% block content %}
 
-<form method="POST">
-	{% csrf_token %}
-	<label for="name">Game Name</label><br>
-	<input type="text" value="Friends Trivia!" id="name" name="name"><br>
-	<label for="g_id">Game Password</label><br>
-	<input type="text" placeholder = "Game Password" id="g_id" name="g_id"><br>
-	<label for="date">Game Date<label><br>
-	<input type="date" id="date" name="date"><br>
-	<input type="submit" value="Submit">
-	
-</form>
+<div class="form-group">
+	<form method="POST">
+		{% csrf_token %}
+		<label for="name">Game Name</label><br>
+		<input type="text" class="form-control" value="Friends Trivia!" id="name" name="name"><br>
+		<label for="g_id">Game Password</label><br>
+		<input type="text" class="form-control" placeholder = "Game Password" id="g_id" name="g_id">
+		<div class="form-group">
+			<label for="date">Game Date:  <label><br>
+			<input type="date" id="date" name="date"><br>
+		</div>
+		<button type="submit" class="btn btn-primary">Submit</button>
+		
+	</form>
+</div>
 {% endblock content %}
