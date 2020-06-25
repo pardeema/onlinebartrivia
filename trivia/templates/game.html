@@ -13,15 +13,24 @@
 <h4>Your current score: <b>{{team.score}}</b></h4>
 <div class="list-group">
 {%for round in rounds %}
+		<div class="card" style="width: 18rem;" >
+				<ul class="list-group list-group-flush">
 
-		<a href="{%url 'round' game.password round.round_num %}" class="list-group-item list-group-item-action {%if round.active %}active{%endif%}">Round {{ round.round_num }} - <b>Status:</b>
-		{% if round.active %} 
-			Active 
-		{% else %} 
-			Inactive
-		{%endif%}
-		</a>
-
+					<li class="list-group-item">
+						<b>Round #{{round.round_num}}: </b>
+						{%if round.active %}
+							<span class="badge badge-success badge-pill">Active</span>
+						{% else %}
+							<span class="badge badge-danger badge-pill">Inactive</span>
+						{%endif %}
+					</li>
+					{%if round.active %}
+						<li class="list-group-item"><b>Round Name: </b> {{round.round_name}}</li>
+						<li class="list-group-item"><a href="{%url 'round' game.password round.round_num %}"><button class="btn btn-primary btn-block">Answer</button></a></li>
+					{%endif%}
+				</ul>
+			</div>
+			<br>
 {%endfor%}
 </div>
 {% endblock content %}

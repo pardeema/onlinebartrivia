@@ -4,12 +4,18 @@
 <h1>Trivia Home</h1>
 
 <h2>Games</h2>
-
+<p> Below is a list of currently active games. If there are none listed, wait until the Quizmaster indicates the game is live</p>
 {% for game in games %}
 	{% if game.active %}
-		<p><b>Game Name:</b> {{game.name}}</p>
-		<p>Game Date: {{game.date}} </p>
-		<p>Status: <a href="{% url 'join_game' %}">Join Now!</a> 
+			<div class="card" style="width: 18rem;" >
+				<ul class="list-group list-group-flush">
+
+					<li class="list-group-item"><b>Game: {{game.name}}</b></li>
+					<li class="list-group-item"><b>Game Date: </b> {{game.date}}</li>
+					<li class="list-group-item"><a href="{%url 'join_game' %}"><button class="btn btn-success btn-block">Join Now!</button></a></li>
+				</ul>
+			</div>
+			<br>
 	{%endif%}
 	
 {% endfor %}
