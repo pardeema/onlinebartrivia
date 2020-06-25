@@ -37,6 +37,9 @@ class Team(models.Model):
     score = models.IntegerField(default=0)
     double_round = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ['game', 'score']
+
     def __str__(self):
         return self.name
     

@@ -31,7 +31,8 @@ def game_home(request, game_id):
     if request.session.get('team_name', False):
         game = get_object_or_404(Game, password = game_id)
         rounds = Round.objects.filter(game = game)
-        context = {'game':game, 'rounds':rounds}
+        team = Team.objects.get(game=game, name=request.session['team_name'])
+        context = {'game':game, 'rounds':rounds, 'team':team}
         return render(request, 'game.html', context)
     else:
         return HttpResponseRedirect(reverse('set_team', args=(game_id,)))
@@ -197,3 +198,12 @@ def admin_score(request, game_id, round_num):
         except:
             continue
     return render(request, "admin/score.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def scoreboard(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams}
+
+    return render(request, "admin/scoreboard.html", context)

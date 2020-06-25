@@ -1,0 +1,14 @@
+{%extends "base.html" %}
+
+{% block content %}
+    <ol>
+    {% for team in teams|dictsortreversed:"score" %}
+        <li>{{team.name}} - {{team.score}} - Doubled? 
+                {% if team.double_round %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}</li>    
+    {% endfor %}
+    </ol>
+{% endblock content %} 
