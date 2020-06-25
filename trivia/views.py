@@ -31,7 +31,8 @@ def game_home(request, game_id):
     if request.session.get('team_name', False):
         game = get_object_or_404(Game, password = game_id)
         rounds = Round.objects.filter(game = game)
-        context = {'game':game, 'rounds':rounds}
+        team = Team.objects.get(game=game, name=request.session['team_name'])
+        context = {'game':game, 'rounds':rounds, 'team':team}
         return render(request, 'game.html', context)
     else:
         return HttpResponseRedirect(reverse('set_team', args=(game_id,)))
@@ -43,6 +44,8 @@ def set_team(request, game_id):
         return HttpResponseRedirect(reverse('game', args=(game.password,)))
     elif request.method == 'POST':
         request.session['team_name'] = request.POST['team_name']
+        team = Team(name = request.POST['team_name'], game=game)
+        team.save()
         return HttpResponseRedirect(reverse('game', args=(game.password,)))
     else:
         return render(request, 'register_team.html')
@@ -55,7 +58,7 @@ def round(request, game_id, round_num):
 
     if request.session.get("{}".format(round.round_num), False):
         team = Team.objects.get(name=request.session['team_name'], game=game)
-        context['team_answers'] = [Team_Answer.objects.get(team=team, question=q) for q in questions]
+        context['team_answers'] = [T_Answer.objects.get(team=team, question=q) for q in questions]
 
     return render(request, 'round.html', context)
 
@@ -63,14 +66,13 @@ def submit_answers(request, game_id, round_num):
     game = get_object_or_404(Game, password=game_id)
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
-    team = Team(name =request.session.get('team_name'), game=game )
-    team.save()
+    team = Team.objects.get(name =request.session.get('team_name'), game=game )
     for question in questions:
-        answer = Team_Answer(answer = request.POST['a{}'.format(question.question_num)],
+        answer = T_Answer(answer = request.POST['a{}'.format(question.question_num)],
                                 question = question, team=team)
         answer.save()
     
-    if request.POST.get('double'):
+    if request.POST.get('double') and not request.session.get('double', False):
         team.double_round = round.round_num
         team.save()
         request.session['double']=round.round_num
@@ -159,3 +161,49 @@ def toggle_round(request, game_id, round_num):
         round.active = True
     round.save()
     return HttpResponseRedirect(reverse('game_details', args=(game_id,)))
+
+@login_required
+@permission_required('is_superuser')
+def admin_score(request, game_id, round_num):
+    game = get_object_or_404(Game, password=game_id)
+    round  = Round.objects.get(game=game, round_num=round_num)
+    teams = Team.objects.filter(game=game)
+    questions = Question.objects.filter(round=round)
+    context={}
+    
+    if request.method=='POST':
+        #Get team we're scoring and current score
+        team = Team.objects.get(game=game, name=request.POST['team'])
+        score = team.score
+        #8 answers submitted, yay magic numbers
+        for i in range(1,9):
+            ta = T_Answer.objects.get(team=team, question=Question.objects.get(round=round, 
+                                question_num="{}".format(i)))
+            #Tally correct answers
+            if request.POST.get("a{}_correct".format(i), False) and not ta.scored:
+                score += int(request.POST.get("a{}".format(i),0))
+                ta.correct = True
+            ta.scored = True
+            ta.save()
+            #If round_num == team.double_round, 2X score
+        if round_num == team.double_round:
+            score = score * 2
+        team.score = score
+        team.save()
+
+    for team in teams:
+        try:
+            ta = {team.name: [T_Answer.objects.get(question=q, team=team) for q in questions]}
+            context.setdefault('team_answers', []).append(ta)
+        except:
+            continue
+    return render(request, "admin/score.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def scoreboard(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams}
+
+    return render(request, "admin/scoreboard.html", context)

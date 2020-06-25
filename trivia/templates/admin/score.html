@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+{% for team in team_answers %}
+    {%for name in team%}
+        
+        <h2>{{name}}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="team" value="{{name}}">
+    {%endfor%}
+        <table>
+        {%for answers in team.values%}
+            {%for a in answers%}
+                {% if not a.scored %}
+                    <tr>
+                        <td class="center" colspan="4"><b>Question #{{a.question.question_num}}: {{a.question.question}}</b></td>
+                    </tr>
+                    <tr>
+                        <th>Answer Key</th>
+                        <th>{{a.team.name}} Answer</th>
+                        <th>Correct?</th>
+                        <th>Points</th>
+                    </tr>
+                    <tr>
+                        <td class="center">{{a.question.answer}}</td> 
+                        <td class="center">{{a.answer}}</td>
+                        <td class="center"><input type="checkbox" id="check{{a.question.question_num}}" name="a{{a.question.question_num}}_correct"></td>
+                        <td class="center"><input type="text" name="a{{a.question.question_num}}" id="points{{a.question.question_num}}" value="0" size=2></td>
+                    </tr>
+                    
+                    <!-- Script issues <script>
+                        $(document).ready(function(){
+
+                            $("#check{{a.question.question_num}}").click(function(){
+
+                                $("#points{{a.question.question_num}}").val("1");
+
+                            });
+
+                        });-->
+
+                    </script>
+                    <!--TODO: Add JS to hide names of scored teams -->
+                {%endif%}
+            {%endfor%}
+                <tr>
+                    <td class="center" colspan="4">
+                            <input type="checkbox" id="confirm" required>
+                            <label for="confirm">Submit score?</label>
+                            <input type="submit" value="Submit Scoring">      
+                    </td>
+                </tr>
+            </table>
+            </form>
+        {%endfor%}
+        <hr><br>
+{%endfor%}
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+td.center {
+  text-align:center;
+}
+</style>
+{%endblock%}
