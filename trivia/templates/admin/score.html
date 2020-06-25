@@ -1,19 +1,31 @@
 {% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+	  <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game_details' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+
 {% block content %}
+<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3><hr>
+<a href="{%url 'game_details' game.password %}"><button class="btn btn-primary btn-lg">Back to Game</button></a><br><br>
+
 {% for team in team_answers %}
     {%for name in team%}
         
-        <h2>{{name}}</h2>
+        <h2><u>Team:</u> {{name}}</h2>
     <form method="POST">
         {% csrf_token %}
         <input type="hidden" name="team" value="{{name}}">
     {%endfor%}
-        <table>
+        <table class="table table-bordered table-sm table-hover">
         {%for answers in team.values%}
             {%for a in answers%}
                 {% if not a.scored %}
                     <tr>
-                        <td class="center" colspan="4"><b>Question #{{a.question.question_num}}: {{a.question.question}}</b></td>
+                        <td class="center table-dark" colspan="4"><b>Question #{{a.question.question_num}}: {{a.question.question}}</b></td>
                     </tr>
                     <tr>
                         <th>Answer Key</th>

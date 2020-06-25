@@ -5,9 +5,12 @@ from django.contrib.auth.decorators import login_required, permission_required
 from .models import *
 
 def index(request):
+    return render(request, 'index.html')
+
+def list_games(request):
     games = Game.objects.all()
     context = {'games': games}
-    return render(request, 'index.html', context)
+    return render(request, 'list.html', context)
 
 def join_game(request):
     error=''
@@ -16,7 +19,8 @@ def join_game(request):
         if game.exists():
             game = Game.objects.get(password = request.POST['game_id'])
             if game.active:
-                #Send to game
+                #Send to game + Store gameID in session
+                request.session['game_id'] = game.password
                 return HttpResponseRedirect(reverse('game', args=(game.password,)))
             else:
                 error = "Game is not active. Please join once Quizmaster indicates."
@@ -169,7 +173,7 @@ def admin_score(request, game_id, round_num):
     round  = Round.objects.get(game=game, round_num=round_num)
     teams = Team.objects.filter(game=game)
     questions = Question.objects.filter(round=round)
-    context={}
+    context={'round': round, 'game':game}
     
     if request.method=='POST':
         #Get team we're scoring and current score
@@ -185,7 +189,7 @@ def admin_score(request, game_id, round_num):
                 ta.correct = True
             ta.scored = True
             ta.save()
-            #If round_num == team.double_round, 2X score
+        #If round_num == team.double_round, 2X score
         if round_num == team.double_round:
             score = score * 2
         team.score = score
@@ -204,6 +208,6 @@ def admin_score(request, game_id, round_num):
 def scoreboard(request, game_id):
     game = get_object_or_404(Game, password=game_id)
     teams = Team.objects.filter(game=game)
-    context = {"teams": teams}
+    context = {"teams": teams, 'game':game}
 
     return render(request, "admin/scoreboard.html", context)

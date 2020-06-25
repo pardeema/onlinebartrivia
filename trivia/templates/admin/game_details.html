@@ -1,17 +1,44 @@
-<h1>Game: {{ game.password }} </h1>
-<ul>
-{%for round in rounds %}
+{% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+	  <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game_details' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+{% block content %}
 
-		<li><a href="{%url 'admin_round' game.password round.round_num %}">Round {{ round.round_num }}</a><span>
-		<p><b>Status:</b> {% if round.active %} 
-					Active 
-					<a href="{% url 'toggle_round' game.password  round.round_num%}">Disable Round</a>
-				{% else %} 
-					Inactive
-					<a href="{% url 'toggle_round' game.password round.round_num %}">Enable Round</a>
-				{%endif%}</p></li>
+<h1>{{ game.name }} - {{game.date}}</h1>
+<h2>Game ID: {{game.password}}</h2>
+<div class="row">
+	<div class="col"> 
+		<a href="{%url 'add_round' game.password %}"><button class="btn btn-success">Add a Round</button></a>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<a href="{%url 'scoreboard' game.password %}"><button class="btn btn-primary">Get Current Scores</button></a>
+	</div>
+</div><br>
+
+{%for round in rounds %}
+	<div class="card" style="width: 18rem;">
+		<ul class="list-group list-group-flush">
+
+			<li class="list-group-item"><b>Round {{ round.round_num }}</b><a href="{%url 'admin_round' game.password round.round_num %}"><button class="btn btn-primary float-right">Details</button></a></li>
+					{% if round.active %} 
+						<li class="list-group-item"><a href="{% url 'toggle_round' game.password  round.round_num%}"><button class="btn btn-success btn-block">Active</button></a>
+					{% else %} 
+						<li class="list-group-item"><a href="{% url 'toggle_round' game.password  round.round_num%}"><button class="btn btn-secondary btn-block">Inactive</button></a>
+
+					{%endif%}
+			</li>
+		</ul>
+	</div>
+	<br>
 
 {%endfor%}
-</ul>
-<br><br>
-<a href="{%url 'add_round' game.password %}">Add Round</a>
+</div>
+
+{% endblock content %}

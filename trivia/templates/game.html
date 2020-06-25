@@ -1,15 +1,27 @@
-<h1>Game: {{ game.password }} </h1>
-<h2>Welcome, Team: {{request.session.team_name}}</h2>
-<h3>Your current score: {{team.score}}
-<ul>
+{% extends "base.html"%}
+
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+
+{% block content %}
+
+<h1>{{ game.name }} - {{game.date}}</h1>
+<h3>Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
+<h4>Your current score: <b>{{team.score}}</b></h4>
+<div class="list-group">
 {%for round in rounds %}
 
-		<li><a href="{%url 'round' game.password round.round_num %}">Round {{ round.round_num }}</a><span>
-		<b>Status:</b> {% if round.active %} 
-					Active 
-				{% else %} 
-					Inactive
-				{%endif%}</li>
+		<a href="{%url 'round' game.password round.round_num %}" class="list-group-item list-group-item-action {%if round.active %}active{%endif%}">Round {{ round.round_num }} - <b>Status:</b>
+		{% if round.active %} 
+			Active 
+		{% else %} 
+			Inactive
+		{%endif%}
+		</a>
 
 {%endfor%}
-</ul>
+</div>
+{% endblock content %}

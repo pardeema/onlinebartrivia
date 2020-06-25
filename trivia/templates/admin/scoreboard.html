@@ -1,14 +1,43 @@
 {%extends "base.html" %}
-
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+	  <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game_details' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
 {% block content %}
+
+<h1>{{ game.name }} - {{game.date}}</h1>
+<h2>Game ID: {{game.password}}</h2>
+<div class="row">
+	<div class="col"> 
+        <a href="{%url 'game_details' game.password %}"><button class="btn btn-primary btn-lg">Back to Game</button></a><br><br>
+	</div>
+</div>
+<div class="row">
     <ol>
     {% for team in teams|dictsortreversed:"score" %}
-        <li>{{team.name}} - {{team.score}} - Doubled? 
-                {% if team.double_round %}
-                    Yes
-                {% else %}
-                    No
-                {% endif %}</li>    
+        <li>  
+            <div class="card" style="width: 18rem;">
+            <ul class="list-group ">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <b>Team:</b> {{team.name}}
+                    <span class="badge badge-primary badge-pill">{{team.score}}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center"> 
+                    <b>Doubled?: </b>
+
+                    {% if team.double_round %}
+                        Yes <span class="badge badge-secondary badge-pill"> R{{team.double_round}}</span>
+                    {% else %}
+                        No
+                    {% endif %}
+                </li>
+            </ul>
+        </li>    
     {% endfor %}
     </ol>
+</div>
 {% endblock content %} 

@@ -1,7 +1,39 @@
-<h1>Game: {{ game.password }} </h1>
-<h2>{{ round.round_name }} </h2>
-<ul>
+{% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+	  <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game_details' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+{% block content %}
+
+<h1>{{ game.name }} - {{game.date}}</h1>
+<h2>Game ID: {{game.password}}</h2>
+
+<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
+
+<div class="row">
+	<div class="col"> 
+		<a href="{%url 'score' game.password round.round_num %}"><button class="btn btn-primary btn-lg">Score Round</button></a><br><br>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<a href="{%url 'game_details' game.password %}"><button class="btn btn-primary">Back to Game</button></a>
+	</div>
+</div><br>
 {%for question in questions %}
-		<li>Question #{{question.question_num}} - {{question.question}}</a></li>
+	<div class="card" >
+		<ul class="list-group list-group-flush">
+
+			<li class="list-group-item"><b>Question #{{question.question_num}}</b></li>
+			<li class="list-group-item">{{question.question}}</li>
+		</ul>
+	</div>
+	<br>
 {%endfor%}
-</ul>
+
+
+{% endblock content %}

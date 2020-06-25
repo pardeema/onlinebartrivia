@@ -1,23 +1,38 @@
-Code to add round here.
-<!-- TODO Add code to view existing round -->
+{% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+	  <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game_details' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+{% block content %}
 
-
+<div class="form-group">
 <form method="POST">
 	{% csrf_token %}
-	<label for="name">Round Name</label><br>
-	<input type="text" placeholder = "Round Name" id="name" name="name"><br>
-	<label for="round_num">Round Number<label><br>
-	<input type="integer" id="round_num" name="round_num"><br>
+	<label for="name"><b>Round Name</b></label><br>
+	<input type="text" class="form-control" placeholder = "Round Name" id="name" name="name"><br>
+	<label for="round_num"><b>Round Number</b></label><br>
+	<input class="form-control" type="integer" id="round_num" name="round_num"><br>
 
 	{% for i in "12345678" %}
-		<label for="q{{i}}">Question {{i}}</label><span>
-		<label for="a{{i}}">Answer {{i}}<label><br>
-		<input type="text" placeholder="Question" id="q{{i}}" 
-					name="q{{i}}"><span>
-		<input type="text" placeholder="Answer" id="a{{i}}" 
-					name="a{{i}}"><br>
-		
+		<div class="form-group row">
+			<div class="col-6">
+				<label  for="q{{i}}"><b>Question {{i}}</b></label>
+				<input class="form-control" type="text" placeholder="Question" id="q{{i}}" 
+							name="q{{i}}">
+			</div>
+			<div class="col-6>
+				<label for="a{{i}}"><b>Answer {{i}}</b></label>
+				<input class="form-control" type="text" placeholder="Answer" id="a{{i}}" 
+							name="a{{i}}">
+			</div>
+		</div>
 	{% endfor %}
-	<input type="submit" value="submit">
+	<button type="submit" class="btn btn-primary">Submit</button>
 	
 </form>
+</div>
+{% endblock content %}
