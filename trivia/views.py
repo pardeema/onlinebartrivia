@@ -5,9 +5,12 @@ from django.contrib.auth.decorators import login_required, permission_required
 from .models import *
 
 def index(request):
+    return render(request, 'index.html')
+
+def list_games(request):
     games = Game.objects.all()
     context = {'games': games}
-    return render(request, 'index.html', context)
+    return render(request, 'list.html', context)
 
 def join_game(request):
     error=''
@@ -16,7 +19,8 @@ def join_game(request):
         if game.exists():
             game = Game.objects.get(password = request.POST['game_id'])
             if game.active:
-                #Send to game
+                #Send to game + Store gameID in session
+                request.session['game_id'] = game.password
                 return HttpResponseRedirect(reverse('game', args=(game.password,)))
             else:
                 error = "Game is not active. Please join once Quizmaster indicates."

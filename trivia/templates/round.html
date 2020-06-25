@@ -1,36 +1,53 @@
 {% extends "base.html" %}
-
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
 {% block content %}
 
-<h1>Game: {{ game.password }} </h1>
-<h2>Team: {{request.session.team_name}}</h2>
+<h1>{{ game.name }} - {{game.date}}</h1>
+<h3>Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
+<a href="{% url 'game' game.password %}"><button class="btn btn-primary btn-lg">Back to Game</button></a><br><br>
 
 {% if team_answers %}
-<h2>{{round.round_name}}</h2>
+<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
 	<h3>You have already submitted answers for this round</h3>
 	<form>
-		{%for answer in team_answers %}
-				<b>Question #{{answer.question.question_num}}:</b> {{answer.question.question}}<br>
-				<label for="a{{answer.question.question_num}}">Your Answer: </label>
-				<input type="text" name="a{{answer.question.question_num}}" value="{{answer.answer}}" readonly><br>
-		{%endfor%}
+		<div class="form-group">
+			{%for answer in team_answers %}
+					<b><u>Question #{{answer.question.question_num}}:</u> {{answer.question.question}}<br></b> 
+					<input class="form-control" type="text" name="a{{answer.question.question_num}}" value="{{answer.answer}}" readonly><br>
+			{%endfor%}
+		</div>
 	</form>
 
 {% elif round.active %}
-	<h2>{{ round.round_name }} </h2>
+<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
 
 	<form action="{% url 'submit_answers' game.password round.round_num%}" method="POST">
-		{% csrf_token %}
-		{%for question in questions %}
-				<b>Question #{{question.question_num}}:</b> {{question.question}}<br>
-				<label for="a{{question.question_num}}">Answer: </label>
-				<input type="text" name="a{{question.question_num}}" placeholder="Enter Answer"><br>
-		{%endfor%}
-		<input type="checkbox" value="yes" name="double" id="double">
-		<label for="double">2X Multiplier?<label>
-		<br><br><label for="check">I'm sure I want to submit</label>
-		<input type="checkbox" required="true" name='check' id="check"><br>
-		<input type="submit" value="Submit">
+		<div class="form-group">
+			{% csrf_token %}
+			{%for question in questions %}
+					<b><u>Question #{{question.question_num}}:</u> {{question.question}}<br></b> 
+					<input class="form-control" type="text" name="a{{question.question_num}}" placeholder="Enter Answer"><br>
+			{%endfor%}
+			{% if request.session.double %}
+				<b>2X has been used in Round {{request.session.double}}</b>
+			{% else %}
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" value="yes" name="double" id="double">
+				<label class="form-check-label" for="double">2X Multiplier?<label>
+			</div>
+			{% endif %}
+
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" required="true" name='check' id="check">
+
+				<label class="form-check-label" for="check">I'm sure I want to submit</label>
+			</div><br>
+			<button type="submit" class="btn btn-primary" >Submit</button>
+		</div>
 	</form>
 
 {% else %}

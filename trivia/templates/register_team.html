@@ -2,11 +2,13 @@
 
 {% block content %}
 
-<form method="POST">
-    {% csrf_token %}
-    <b><label for="team_name">Enter your team name:</label></b><br>
-    <input type="text" name="team_name" placeholder="Enter Team Name">
-    <input type="submit" value="Submit">
-</form>
+<div class="form-group">
+    <form method="POST">
+        {% csrf_token %}
+        <b><label for="team_name">Enter your team name:</label></b><br>
+        <input class="form-control" type="text" name="team_name" placeholder="Enter Team Name">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
 
 {% endblock content %}
