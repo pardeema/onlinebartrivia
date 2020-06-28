@@ -3,6 +3,9 @@
 {% block content %}
 
 <div class="form-group">
+    {% if error %}
+    <b style="color:red;">{{error}}</b><br>
+    {%endif%}
     <form method="POST">
         {% csrf_token %}
         <b><label for="team_name">Enter your team name:</label></b><br>

@@ -5,7 +5,7 @@
     <form method="POST">
         {% csrf_token %}
         {% if error %}
-        <b color="red">{{error}}</b><br>
+        <b style="color:red;">{{error}}</b><br>
         {%endif%}
         <label for="game_id"><b>Game ID:</b></label><br>
         <input class="form-control" type="text" id="game_id" name="game_id" placeholder="Enter Game ID">

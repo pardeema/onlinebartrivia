@@ -29,7 +29,7 @@ class Question(models.Model):
     round = models.ForeignKey(Round, on_delete=models.CASCADE)
     
     def __str__(self):
-        return "Question {}".format(self.question_num)
+        return "Round {}, Game {}: Question {}".format(self.round.round_num, self.round.game.password, self.question_num)
 
 class Team(models.Model):
     name = models.CharField(max_length=140)

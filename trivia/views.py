@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from .models import *
 
 def index(request):
+    request.session.set_expiry(21600)
     return render(request, 'index.html')
 
 def list_games(request):
@@ -43,10 +44,13 @@ def game_home(request, game_id):
 
 def set_team(request, game_id):
     game = get_object_or_404(Game, password = game_id)
-    
+
     if request.session.get('team_name', False):
         return HttpResponseRedirect(reverse('game', args=(game.password,)))
     elif request.method == 'POST':
+        if Team.objects.filter(game=game, name=request.POST['team_name']).exists():
+            return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another"})
+        request.session.set_expiry(21600)
         request.session['team_name'] = request.POST['team_name']
         team = Team(name = request.POST['team_name'], game=game)
         team.save()
@@ -72,15 +76,18 @@ def submit_answers(request, game_id, round_num):
     questions = Question.objects.filter(round = round)
     team = Team.objects.get(name =request.session.get('team_name'), game=game )
     for question in questions:
-        answer = T_Answer(answer = request.POST['a{}'.format(question.question_num)],
-                                question = question, team=team)
+        a = "Did not submit answers in time"
+        if round.active:
+            a = request.POST['a{}'.format(question.question_num)]
+        answer = T_Answer(answer = a, question = question, team=team)
         answer.save()
     
-    if request.POST.get('double') and not request.session.get('double', False):
+    if request.POST.get('double') and not request.session.get('double', False) and round.active:
         team.double_round = round.round_num
         team.save()
         request.session['double']=round.round_num
     
+    request.session['answered'] = round.round_num
     request.session["{}".format(round.round_num)] = True
     return HttpResponseRedirect(reverse('game', args=(game_id,)))
 
@@ -88,6 +95,7 @@ def submit_answers(request, game_id, round_num):
 @login_required
 @permission_required('is_superuser')
 def admin(request):
+    request.session.set_expiry(21600)
     games = Game.objects.all()
     context = {'games': games}
     return render(request, 'admin/admin.html', context)
@@ -179,19 +187,21 @@ def admin_score(request, game_id, round_num):
         #Get team we're scoring and current score
         team = Team.objects.get(game=game, name=request.POST['team'])
         score = team.score
+        temp_score=0
         #8 answers submitted, yay magic numbers
         for i in range(1,9):
             ta = T_Answer.objects.get(team=team, question=Question.objects.get(round=round, 
                                 question_num="{}".format(i)))
             #Tally correct answers
             if request.POST.get("a{}_correct".format(i), False) and not ta.scored:
-                score += int(request.POST.get("a{}".format(i),0))
+                temp_score += int(request.POST.get("a{}".format(i),0))
                 ta.correct = True
             ta.scored = True
             ta.save()
         #If round_num == team.double_round, 2X score
         if round_num == team.double_round:
-            score = score * 2
+            temp_score = temp_score * 2
+        score += temp_score
         team.score = score
         team.save()
 
