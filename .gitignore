@@ -11,4 +11,5 @@ polls/__pycache__/views.cpython-37.pyc
 polls/migrations/__init__.py
 db.sqlite3
 settings.py
+onlinebartrivia/settings_backup
 *.pyc

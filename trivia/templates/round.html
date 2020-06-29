@@ -14,13 +14,14 @@
 	<h4>Your current score: <b>{{team.score}}</b></h4>
 {% endif %}
 <a href="{% url 'game' game.password %}"><button class="btn btn-primary btn-lg">Back to Game</button></a><br><br>
+{%if round.url %}
+    <p>URL For Supplemental material: <a href="{{round.url}}" target=_blank>Click Here</a></p>
+{%endif%}
+
 
 {% if team_answers %}
 <h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
 	<h3>You have already submitted answers for this round</h3>
-	{%if round.url %}
-		<p>URL For Supplemental material: <a href="{{round.url}}" target=_blank>Click Here</a></p> 
-	{%endif %}
 	<form>
 		<div class="form-group">
 			{%for answer in team_answers %}
