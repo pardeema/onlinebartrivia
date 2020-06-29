@@ -22,7 +22,7 @@ def join_game(request):
             if game.active:
                 #Send to game + Store gameID in session
                 request.session['game_id'] = game.password
-                return HttpResponseRedirect(reverse('game', args=(game.password,)))
+                return HttpResponseRedirect(reverse('set_team', args=(game.password,)))
             else:
                 error = "Game is not active. Please join once Quizmaster indicates."
                 return render(request, 'join.html', {'error': error})
@@ -36,7 +36,10 @@ def game_home(request, game_id):
     if request.session.get('team_name', False):
         game = get_object_or_404(Game, password = game_id)
         rounds = Round.objects.filter(game = game)
-        team = Team.objects.get(game=game, name=request.session['team_name'])
+        if request.session['team_name'] == "Viewer":
+            team = None
+        else:
+            team = Team.objects.get(game=game, name=request.session['team_name'])
         context = {'game':game, 'rounds':rounds, 'team':team}
         return render(request, 'game.html', context)
     else:
@@ -45,15 +48,21 @@ def game_home(request, game_id):
 def set_team(request, game_id):
     game = get_object_or_404(Game, password = game_id)
 
+    #If team name has already been set, redirect to game homepage
     if request.session.get('team_name', False):
         return HttpResponseRedirect(reverse('game', args=(game.password,)))
     elif request.method == 'POST':
-        if Team.objects.filter(game=game, name=request.POST['team_name']).exists():
-            return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another"})
+        submitted = request.POST['team_name']
+        
+        if submitted != "Viewer":
+            #Uniqueness of team name per game
+            if Team.objects.filter(game=game, name=submitted).exists():
+                return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another"})
+            team = Team(name = submitted, game=game)
+            team.save()
+
         request.session.set_expiry(21600)
-        request.session['team_name'] = request.POST['team_name']
-        team = Team(name = request.POST['team_name'], game=game)
-        team.save()
+        request.session['team_name'] = submitted
         return HttpResponseRedirect(reverse('game', args=(game.password,)))
     else:
         return render(request, 'register_team.html')
