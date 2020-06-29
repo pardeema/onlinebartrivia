@@ -13,6 +13,7 @@ class Game(models.Model):
 class Round(models.Model):
     round_num = models.IntegerField(default=1)
     round_name = models.CharField(max_length=140)
+    url = models.URLField(blank=True)
     active = models.BooleanField(default=False)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     
@@ -46,6 +47,7 @@ class Team(models.Model):
 class T_Answer(models.Model):
     answer = models.CharField(max_length=255)
     correct = models.BooleanField(default=False)
+    points = models.IntegerField(default=0)
     scored = models.BooleanField(default = False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete = models.CASCADE)
