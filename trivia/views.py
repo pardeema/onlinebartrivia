@@ -124,8 +124,16 @@ def admin_round(request, game_id, round_num):
     game = get_object_or_404(Game, password=game_id)
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
-    
+    teams = Team.objects.filter(game = game)
     context = {'game': game, 'round': round, 'questions': questions}
+
+    for team in teams:
+        try:
+            ta = {team.name: [T_Answer.objects.get(question=q, team=team) for q in questions]}
+            context.setdefault('team_answers', []).append(ta)
+        except:
+            continue
+
     return render(request, 'admin/round.html', context)
 
 @login_required
@@ -136,6 +144,7 @@ def add_round(request, game_id):
     if request.method == 'POST':
         r = Round(round_num = request.POST['round_num'],
                         round_name = request.POST['name'],
+                        url = request.POST.get('url', None),
                         game = game)
         r.save()
         #There will be 8 items so iterate through that -- ew, magic numbers
@@ -198,15 +207,16 @@ def admin_score(request, game_id, round_num):
         score = team.score
         temp_score=0
         #8 answers submitted, yay magic numbers
-        for i in range(1,9):
-            ta = T_Answer.objects.get(team=team, question=Question.objects.get(round=round, 
-                                question_num="{}".format(i)))
+        for answer in T_Answer.objects.filter(team=team, question__round = round):
+            num = answer.question.question_num
             #Tally correct answers
-            if request.POST.get("a{}_correct".format(i), False) and not ta.scored:
-                temp_score += int(request.POST.get("a{}".format(i),0))
-                ta.correct = True
-            ta.scored = True
-            ta.save()
+            if request.POST.get("a{}_correct".format(num), False) and not answer.scored:
+                pts = int(request.POST.get("a{}".format(num), 0 ))
+                temp_score += pts
+                answer.points = pts
+                answer.correct = True
+            answer.scored = True
+            answer.save()
         #If round_num == team.double_round, 2X score
         if round_num == team.double_round:
             temp_score = temp_score * 2
@@ -221,6 +231,48 @@ def admin_score(request, game_id, round_num):
         except:
             continue
     return render(request, "admin/score.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def admin_edit_score(request, game_id, round_num):
+    game = get_object_or_404(Game, password=game_id)
+    round  = Round.objects.get(game=game, round_num=round_num)
+    questions = Question.objects.filter(round=round)
+    context={'round': round, 'game':game}
+    
+    if request.method=='POST':
+        #Get team we're scoring and current score
+        team = Team.objects.get(game=game, name=request.POST['team'])
+        score = team.score
+        temp_score=0
+        subtract_score=0
+
+        for answer in T_Answer.objects.filter(team=team, question__round = round):
+            num = answer.question.question_num
+            #Gotta make sure to subtract prev score
+            if answer.correct:
+                subtract_score += answer.points
+
+            #Tally correct answers
+            if request.POST.get("a{}_correct".format(num), False) and answer.scored:
+                pts = int(request.POST.get("a{}".format(num), 0))
+                temp_score += pts
+                answer.points = pts
+                answer.correct = True
+            else:
+                answer.correct = False
+            
+            answer.save()
+        #If round_num == team.double_round, 2X score
+        if round_num == team.double_round:
+            temp_score = temp_score * 2
+            subtract_score = subtract_score * 2
+        score -= subtract_score
+        score += temp_score
+        team.score = score
+        team.save()
+
+    return HttpResponseRedirect(reverse('admin_round', args=(game_id, round_num,)))
 
 @login_required
 @permission_required('is_superuser')
