@@ -7,7 +7,12 @@
 {% block content %}
 
 <h1>{{ game.name }} - {{game.date}}</h1>
-<h3>Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
+{%if request.session.team_name == "Viewer" %}
+	<h3>VIEW ONLY</h3>
+{%else %}
+	<h3>Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
+	<h4>Your current score: <b>{{team.score}}</b></h4>
+{% endif %}
 <a href="{% url 'game' game.password %}"><button class="btn btn-primary btn-lg">Back to Game</button></a><br><br>
 
 {% if team_answers %}
@@ -21,6 +26,20 @@
 			{%endfor%}
 		</div>
 	</form>
+
+{% elif request.session.team_name == "Viewer" %}
+<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
+
+{%for question in questions %}
+	<div class="card" >
+		<ul class="list-group list-group-flush">
+
+			<li class="list-group-item"><b>Question #{{question.question_num}}</b></li>
+			<li class="list-group-item">{{question.question}}</li>
+		</ul>
+	</div>
+	<br>
+{%endfor%}
 
 {% elif round.active %}
 <h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
