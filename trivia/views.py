@@ -16,9 +16,10 @@ def list_games(request):
 def join_game(request):
     error=''
     if request.method=='POST':
-        game = Game.objects.filter(password = request.POST['game_id'])
+        game_id = request.POST['game_id'].upper().strip()
+        game = Game.objects.filter(password = game_id)
         if game.exists():
-            game = Game.objects.get(password = request.POST['game_id'])
+            game = Game.objects.get(password = game_id)
             if game.active:
                 #Send to game + Store gameID in session
                 request.session['game_id'] = game.password
@@ -163,7 +164,7 @@ def add_round(request, game_id):
 @permission_required('is_superuser')
 def add_game(request):
     if request.method == 'POST':
-        g = Game(name=request.POST['name'], password=request.POST['g_id'], date=request.POST['date'])
+        g = Game(name=request.POST['name'], password=request.POST['g_id'].upper().strip(), date=request.POST['date'])
         g.save()
         return HttpResponseRedirect(reverse('admin'))
     else:
