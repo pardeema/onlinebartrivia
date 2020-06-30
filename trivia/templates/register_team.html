@@ -4,34 +4,50 @@
 
 <div class="row">
     <div class="col collapse show" id="toggle">
-        <form method="POST">
-            Click if you want to only VIEW questions to help your team<br>
-            {% csrf_token %}
-            <input type="hidden" name="team_name" value="Viewer"> 
-            <button type="submit" class="btn btn-primary">View Only</button>
+            Click if you want to only <b>VIEW</b> questions to help your team<br>
+            <button data-target="#toggle,#viewer" class="btn btn-primary" data-toggle="collapse">View Only</button>
         </form>
     </div>
     <div class="col collapse show" id="toggle">
         Click if you will be submitting answers tonight<br>
-        <a href="#toggle" class="btn btn-primary" data-toggle="collapse">I Will Submit Answers</a>
+        <b><u>NOTE:</u> Only one person per team should submit answers</b><br>
+        <button data-target="#toggle,#submitter" class="btn btn-primary" data-toggle="collapse">I Will Submit Answers</a>
     </div>
 </div>
 
-<div class="row collapse" id="toggle">
-    <div class="form-group collapse" id="toggle">
+<div class="row collapse" id="viewer">
+    <div class="form-group collapse" id="viewer">
+        <form method="POST">
+            You're sure you want to <b><u>VIEW ONLY</u></b>?<br>
+            {% csrf_token %}
+            <input type ="hidden" name="team_name" value="Viewer">
+            <input type="checkbox" required id="viewonly">
+            <label for="viewonly">I am sure</label>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+<div class="row collapse" id="viewer">
+    <a href="#toggle, #viewer" class="btn btn-primary" data-toggle="collapse">I want to Submit Answers</a>
+</div>
+
+<div class="row collapse" id="submitter">
+    <div class="form-group collapse" id="submitter">
         {% if error %}
         <b style="color:red;">{{error}}</b><br>
         {%endif%}
         <form method="POST">
             {% csrf_token %}
             <b><label for="team_name">Great! Enter your team name:</label></b><br>
-            <input class="form-control" type="text" name="team_name" placeholder="Enter Team Name">
+            <input class="form-control" type="text" name="team_name" placeholder="Enter Team Name"><br>
+            <input type="checkbox" required id="confirmteam">
+            <label for="confirmteam">I'm sure I will be <b>submitting answers</b></label>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 </div>
-    <div class="row collapse" id="toggle">
-    <a href="#toggle" class="btn btn-primary" data-toggle="collapse">I want to View Only</a>
+    <div class="row collapse" id="submitter">
+    <a href="#toggle, #submitter" class="btn btn-primary" data-toggle="collapse">I want to View Only</a>
     </div>
 <style>
     .collapsing {
