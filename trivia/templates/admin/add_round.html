@@ -22,18 +22,18 @@
 		<div class="form-group row">
 			<div class="col-6">
 				<label  for="q{{i}}"><b>Question {{i}}</b></label>
-				<input class="form-control" type="text" placeholder="Question" id="q{{i}}" 
+				<input class="form-control" type="text" placeholder="Question" id="q{{i}}"
 							name="q{{i}}">
 			</div>
-			<div class="col-6>
+			<div class="col-6">
 				<label for="a{{i}}"><b>Answer {{i}}</b></label>
-				<input class="form-control" type="text" placeholder="Answer" id="a{{i}}" 
+				<input class="form-control" type="text" placeholder="Answer" id="a{{i}}"
 							name="a{{i}}">
 			</div>
 		</div>
 	{% endfor %}
 	<button type="submit" class="btn btn-primary">Submit</button>
-	
+
 </form>
 </div>
 {% endblock content %}
