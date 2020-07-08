@@ -5,12 +5,25 @@
     <form method="POST">
         {% csrf_token %}
         {% if error %}
-        <b style="color:red;">{{error}}</b><br>
+        <div class="alert alert-dismissible alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Error!</h4>
+            <p class="mb-0">{{error}}</p>
+        </div>
         {%endif%}
-        <label for="game_id"><b>Game ID:</b></label><br>
-        <input class="form-control" type="text" id="game_id" name="game_id" placeholder="Enter Game ID">
-        <button type="submit" class="btn btn-success">Join Game!</button>
-    </form>
+
+        <div class="card border-info mb-3" >
+            <div class="card-header">Join Game</div>
+            <div class="card-body">
+                <h4 class="card-title">Enter Game ID/password here:</h4>
+                <label for="game_id"><b>Game ID:</b></label><br>
+                <input class="form-control card-text" type="text" id="game_id" name="game_id" placeholder="Enter Game ID"><br>
+                <button type="submit" class="btn btn-info">Join Game!</button>
+            </form>
+            </div>
+        </div>
+
+        
 </div>
 
 {% endblock content %}
