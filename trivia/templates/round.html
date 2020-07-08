@@ -5,76 +5,79 @@
       </li>
 {% endblock home_nav %}
 {% block content %}
+<div class="card border-info mb-3">
+	<div class="card-body">
+		<h1 class="card-title">{{ game.name }} - {{game.date}}</h1>
+		{%if request.session.team_name == "Viewer" %}
+			<h3 class="card-title">VIEW ONLY</h3>
+		{%else %}
+			<h3 class="card-title">Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
+			<h4 class="card-title">Your current score: <b>{{team.score}}</b></h4>
+		{% endif %}
+		<a href="{% url 'game' game.password %}"><button class="btn btn-info btn-lg">Back to Game</button></a><br><br>
+		{%if round.url %}
+			<p class="card-text">URL For Supplemental material: <a href="{{round.url}}" target=_blank>Click Here</a></p>
+		{%endif%}
 
-<h1>{{ game.name }} - {{game.date}}</h1>
-{%if request.session.team_name == "Viewer" %}
-	<h3>VIEW ONLY</h3>
-{%else %}
-	<h3>Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
-	<h4>Your current score: <b>{{team.score}}</b></h4>
-{% endif %}
-<a href="{% url 'game' game.password %}"><button class="btn btn-primary btn-lg">Back to Game</button></a><br><br>
-{%if round.url %}
-    <p>URL For Supplemental material: <a href="{{round.url}}" target=_blank>Click Here</a></p>
-{%endif%}
 
+		{% if team_answers %}
+		<h3 class="card-title"><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
+			<h3 class="card-title">You have already submitted answers for this round</h3>
+			<form>
+				<div class="form-group">
+					{%for answer in team_answers %}
+							<label class="card-text" for="a{{answer.question.question_num}}"><b><u>Question #{{answer.question.question_num}}:</u> {{answer.question.question}}</label><br></b>
+							<input class="form-control card-text" type="text" name="a{{answer.question.question_num}}" value="{{answer.answer}}" readonly><br>
+					{%endfor%}
+				</div>
+			</form>
 
-{% if team_answers %}
-<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
-	<h3>You have already submitted answers for this round</h3>
-	<form>
-		<div class="form-group">
-			{%for answer in team_answers %}
-					<b><u>Question #{{answer.question.question_num}}:</u> {{answer.question.question}}<br></b> 
-					<input class="form-control" type="text" name="a{{answer.question.question_num}}" value="{{answer.answer}}" readonly><br>
-			{%endfor%}
-		</div>
-	</form>
+		{% elif request.session.team_name == "Viewer" %}
+		<h3 class="card-title"><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
 
-{% elif request.session.team_name == "Viewer" %}
-<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
+		{%for question in questions %}
+			<div class="card border-secondary" >
+				<ul class="list-group list-group-flush">
 
-{%for question in questions %}
-	<div class="card" >
-		<ul class="list-group list-group-flush">
-
-			<li class="list-group-item"><b>Question #{{question.question_num}}</b></li>
-			<li class="list-group-item">{{question.question}}</li>
-		</ul>
-	</div>
-	<br>
-{%endfor%}
-
-{% elif round.active %}
-<h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
-
-	<form action="{% url 'submit_answers' game.password round.round_num%}" method="POST">
-		<div class="form-group">
-			{% csrf_token %}
-			{%for question in questions %}
-					<b><u>Question #{{question.question_num}}:</u> {{question.question}}<br></b> 
-					<input class="form-control" type="text" name="a{{question.question_num}}" placeholder="Enter Answer"><br>
-			{%endfor%}
-			{% if request.session.double %}
-				<b>2X has been used in Round {{request.session.double}}</b>
-			{% else %}
-			<div class="form-check">
-				<input class="form-check-input" type="checkbox" value="yes" name="double" id="double">
-				<label class="form-check-label" for="double">2X Multiplier?<label>
+					<li class="list-group-item card-text"><b>Question #{{question.question_num}}</b></li>
+					<li class="list-group-item card-text">{{question.question}}</li>
+				</ul>
 			</div>
-			{% endif %}
+			<br>
+		{%endfor%}
 
-			<div class="form-check">
-				<input class="form-check-input" type="checkbox" required="true" name='check' id="check">
+		{% elif round.active %}
+		<h3 class="card-title"><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
 
-				<label class="form-check-label" for="check">I'm sure I want to submit</label>
-			</div><br>
-			<button type="submit" class="btn btn-primary" >Submit</button>
-		</div>
-	</form>
+			<form action="{% url 'submit_answers' game.password round.round_num%}" method="POST">
+				<div class="form-group">
+					{% csrf_token %}
+					{%for question in questions %}
+							<b class="card-text"><u>Question #{{question.question_num}}:</u> {{question.question}}<br></b> 
+							<input class="form-control card-text" type="text" name="a{{question.question_num}}" placeholder="Enter Answer"><br>
+					{%endfor%}
+					{% if request.session.double %}
+						<b class="card-text">2X has been used in Round {{request.session.double}}</b>
+					{% else %}
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="yes" name="double" id="double">
+						<label class="form-check-label card-text" for="double">2X Multiplier?<label>
+					</div>
+					{% endif %}
 
-{% else %}
-This round is not active. Check back after the Quizmaster has annouced it is active.
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" required="true" name='check' id="check">
 
-{% endif %}
+						<label class="form-check-label card-text" for="check">I'm sure I want to submit</label>
+					</div><br>
+					<button type="submit" class="btn btn-primary card-text" >Submit</button>
+				</div>
+			</form>
+
+		{% else %}
+		<p class="card-text">This round is not active. Check back after the Quizmaster has annouced it is active.</p>
+
+		{% endif %}
+	</div>
+</div>
 {% endblock content %}

@@ -8,10 +8,9 @@
     <meta name="generator" content="Jekyll v4.0.1">
     <title>Online Bar Trivia</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
     <link rel ="shortcut icon" href="{% static 'favicon.ico' %}"/>
     <!-- Bootstrap core CSS -->
-<link href="{%static 'assets/dist/css/bootstrap.css' %}" rel="stylesheet">
+<link href="{%static 'assets/dist/css/bootstrap.min.css' %}" rel="stylesheet">
 
     <style>
       .bd-placeholder-img {
@@ -34,7 +33,9 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="{%url 'index' %}">Online Bar Trivia</a>
+  <a class="navbar-brand" href="{%url 'index' %}">
+    Online Bar Trivia
+  </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>

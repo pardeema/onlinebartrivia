@@ -13,3 +13,4 @@ db.sqlite3
 settings.py
 onlinebartrivia/settings_backup
 *.pyc
+static/assets/dist/css/bootstrap.min_old.css

@@ -7,19 +7,23 @@
 
 {% block content %}
 
-<div class="form-group">
-	<form method="POST">
-		{% csrf_token %}
-		<label for="name">Game Name</label><br>
-		<input type="text" class="form-control" value="Friends Trivia!" id="name" name="name"><br>
-		<label for="g_id">Game Password</label><br>
-		<input type="text" class="form-control" placeholder = "Game Password" id="g_id" name="g_id">
-		<div class="form-group">
-			<label for="date">Game Date:  <label><br>
-			<input type="date" id="date" name="date"><br>
-		</div>
-		<button type="submit" class="btn btn-primary">Submit</button>
-		
-	</form>
+<div class="card border-info mb-3">
+	<div class="form-group card-body">
+		<h4 class="card-title">Add a Game</h4>
+
+		<form method="POST">
+			{% csrf_token %}
+			<label for="name">Game Name</label><br>
+			<input type="text" class="form-control" value="Friends Trivia!" id="name" name="name"><br>
+			<label for="g_id">Game Password</label><br>
+			<input type="text" class="form-control" placeholder = "Game Password" id="g_id" name="g_id"><br>
+			<div class="form-group">
+				<label for="date">Game Date:  </label><br>
+				<input type="date" id="date" name="date"><br>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+			
+		</form>
+	</div>
 </div>
 {% endblock content %}
