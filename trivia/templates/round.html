@@ -47,7 +47,7 @@
 				</div>
 			</form>
 
-		{% elif request.session.team_name == "Viewer" %}
+        {% elif request.session.team_name == "Viewer" and round.active %}
 		<h3 class="card-title"><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
 
 		{%for question in questions %}
