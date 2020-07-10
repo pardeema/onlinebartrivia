@@ -16,7 +16,12 @@
 		{% endif %}
 		<a href="{% url 'game' game.password %}"><button class="btn btn-info btn-lg">Back to Game</button></a><br><br>
 		{%if round.url %}
-			<p class="card-text">URL For Supplemental material: <a href="{{round.url}}" target=_blank>Click Here</a></p>
+			<h5>URL for additional material:</h5>
+			<p class="card-text">URL: <a href="{{round.url}}" target=_blank>Click Here</a></p>
+		{%endif%}
+		{%if round.description %}
+			<h5>Description: </h5>
+			<p class="card-text">{{round.description}}</p>
 		{%endif%}
 
 
@@ -26,8 +31,18 @@
 			<form>
 				<div class="form-group">
 					{%for answer in team_answers %}
-							<label class="card-text" for="a{{answer.question.question_num}}"><b><u>Question #{{answer.question.question_num}}:</u> {{answer.question.question}}</label><br></b>
-							<input class="form-control card-text" type="text" name="a{{answer.question.question_num}}" value="{{answer.answer}}" readonly><br>
+					<div class="row">
+						<div class="col">
+							<label class="card-text form-control-label" for="a{{answer.question.question_num}}"><b><u>Question #{{answer.question.question_num}}:</u> {{answer.question.question}}</label><br></b>
+							<input class="form-control card-text {%if not round.active and answer.scored %}{%if answer.correct%}is-valid {%else%}is-invalid{%endif%}{%endif%}" type="text" name="a{{answer.question.question_num}}" value="{{answer.answer}}" readonly><br>
+						</div>
+						{%if not round.active and answer.scored %}
+							<div class="col-1">
+								<label class="card-text" for="pts{{answer.question.question_num}}"><b>Points:</b></label><br>
+								<button class="card-text btn btn-outline-primary" id="pts{{answer.question.question_num}}" onclick="return false;">{{answer.points}}</button>
+							</div>
+						{%endif%}
+					</div>
 					{%endfor%}
 				</div>
 			</form>

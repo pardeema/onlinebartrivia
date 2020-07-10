@@ -13,9 +13,14 @@
         <h1>{{ game.name }} - {{game.date}}</h1>
         <h2>Game ID: {{game.password}}</h2>
         <h3><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
-            {%if round.url %}
-                <p>URL For Supplemental material: <a href="{{round.url}}" target=_blank>Click Here</a></p> 
-            {%endif %}
+        {%if round.url %}
+			<h5>URL for additional material:</h5>
+			<p class="card-text">URL: <a href="{{round.url}}" target=_blank>Click Here</a></p>
+		{%endif%}
+		{%if round.description %}
+			<h5>Description: </h5>
+			<p class="card-text">{{round.description}}</p>
+		{%endif%}
         <div class="row">
             <div class="col"> 
                 <a href="{%url 'score' game.password round.round_num %}"><button class="btn btn-info btn-lg">Score Round</button></a><br><br>
