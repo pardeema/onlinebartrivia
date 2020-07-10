@@ -146,6 +146,7 @@ def add_round(request, game_id):
         r = Round(round_num = request.POST['round_num'],
                         round_name = request.POST['name'],
                         url = request.POST.get('url', None),
+                        description = request.POST.get('description', None),
                         game = game)
         r.save()
         #There will be 8 items so iterate through that -- ew, magic numbers

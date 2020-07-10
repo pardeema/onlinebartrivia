@@ -13,6 +13,7 @@ class Game(models.Model):
 class Round(models.Model):
     round_num = models.IntegerField(default=1)
     round_name = models.CharField(max_length=140)
+    description = models.CharField(max_length=9999, blank=True)
     url = models.URLField(blank=True)
     active = models.BooleanField(default=False)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
@@ -25,8 +26,8 @@ class Round(models.Model):
    
 class Question(models.Model):
     question_num = models.IntegerField(default=1)
-    question = models.CharField(max_length=999)
-    answer = models.CharField(max_length=255)
+    question = models.CharField(max_length=9999)
+    answer = models.CharField(max_length=999)
     round = models.ForeignKey(Round, on_delete=models.CASCADE)
     
     def __str__(self):
