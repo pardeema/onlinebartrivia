@@ -165,7 +165,7 @@ def add_round(request, game_id):
 @permission_required('is_superuser')
 def add_game(request):
     if request.method == 'POST':
-        g = Game(name=request.POST['name'], password=request.POST['g_id'].upper().strip(), date=request.POST['date'])
+        g = Game(name=request.POST['name'], password=request.POST['g_id'].upper().strip(), date=request.POST['date'], double_or_nothing=request.POST.get('double_or_nothing', False))
         g.save()
         return HttpResponseRedirect(reverse('admin'))
     else:
@@ -208,8 +208,8 @@ def admin_score(request, game_id, round_num):
         team = Team.objects.get(game=game, name=request.POST['team'])
         score = team.score
         temp_score=0
-        #8 answers submitted, yay magic numbers
-        for answer in T_Answer.objects.filter(team=team, question__round = round):
+        answers = T_Answer.objects.filter(team=team, question__round = round)
+        for answer in answers:
             num = answer.question.question_num
             #Tally correct answers
             if request.POST.get("a{}_correct".format(num), False) and not answer.scored:
@@ -217,8 +217,15 @@ def admin_score(request, game_id, round_num):
                 temp_score += pts
                 answer.points = pts
                 answer.correct = True
+            
             answer.scored = True
             answer.save()
+
+        if game.double_or_nothing and round_num == team.double_round:
+            double_fail = enforce_double_or_nothing(answers)
+            if double_fail:
+                temp_score = 0
+
         #If round_num == team.double_round, 2X score
         if round_num == team.double_round:
             temp_score = temp_score * 2
@@ -234,6 +241,21 @@ def admin_score(request, game_id, round_num):
             continue
     return render(request, "admin/score.html", context)
 
+def enforce_double_or_nothing(answers):
+    """Given an array of answer objects, check for incorrect answer if double or nothing is set
+    and then wipe out the points"""
+
+    double_fail = any(not answer.correct for answer in answers)
+    
+    if double_fail:
+        for answer in answers:
+            answer.points = 0
+            answer.save()
+        return True
+
+    return False
+
+
 @login_required
 @permission_required('is_superuser')
 def admin_edit_score(request, game_id, round_num):
@@ -248,8 +270,9 @@ def admin_edit_score(request, game_id, round_num):
         score = team.score
         temp_score=0
         subtract_score=0
-
-        for answer in T_Answer.objects.filter(team=team, question__round = round):
+        answers = T_Answer.objects.filter(team=team, question__round = round)
+        
+        for answer in answers:
             num = answer.question.question_num
             #Gotta make sure to subtract prev score
             if answer.correct:
@@ -265,6 +288,12 @@ def admin_edit_score(request, game_id, round_num):
                 answer.correct = False
             
             answer.save()
+
+        if game.double_or_nothing and round_num == team.double_round:
+            double_fail = enforce_double_or_nothing(answers)
+            if double_fail:
+                temp_score = 0
+
         #If round_num == team.double_round, 2X score
         if round_num == team.double_round:
             temp_score = temp_score * 2

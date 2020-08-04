@@ -14,3 +14,10 @@ settings.py
 onlinebartrivia/settings_backup
 *.pyc
 static/assets/dist/css/bootstrap.min_old.css
+trivia/__pycache__/models.cpython-37.pyc
+trivia/__pycache__/views.cpython-37.pyc
+trivia/migrations/0017_auto_20200803_2219.py
+trivia/__pycache__/models.cpython-37.pyc
+trivia/__pycache__/views.cpython-37.pyc
+trivia/__pycache__/models.cpython-37.pyc
+trivia/__pycache__/views.cpython-37.pyc
