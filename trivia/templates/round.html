@@ -28,6 +28,7 @@
 		{% if team_answers %}
 		<h3 class="card-title"><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
 			<h3 class="card-title">You have already submitted answers for this round</h3>
+			{% if request.session.double == round.round_num %}<h4 class="card-title">You have <b>doubled</b> this round!</h4>{%endif%}
 			<form>
 				<div class="form-group">
 					{%for answer in team_answers %}
@@ -39,7 +40,13 @@
 						{%if not round.active and answer.scored %}
 							<div class="col-1">
 								<label class="card-text" for="pts{{answer.question.question_num}}"><b>Points:</b></label><br>
-								<button class="card-text btn btn-outline-primary" id="pts{{answer.question.question_num}}" onclick="return false;">{{answer.points}}</button>
+								<button class="card-text btn btn-outline-primary" id="pts{{answer.question.question_num}}" onclick="return false;">
+									{%if round.round_num == request.session.double %}
+										{{answer.points|add:answer.points}}
+									{%else %}
+										{{answer.points }}
+									{%endif%}
+								</button>
 							</div>
 						{%endif%}
 					</div>
@@ -76,7 +83,7 @@
 					{% else %}
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" value="yes" name="double" id="double">
-						<label class="form-check-label card-text" for="double">2X Multiplier?<label>
+						<label class="form-check-label card-text" for="double">2X Multiplier? {%if game.double_or_nothing %}<b>DOUBLE OR NOTHING</b>{%endif%}<label>
 					</div>
 					{% endif %}
 

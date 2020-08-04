@@ -12,6 +12,7 @@
 	<div class="card-header">
 		<h1>{{ game.name }} - {{game.date}}</h1>
 		<h2>Game ID: {{game.password}}</h2>
+		<h5>{%if game.double_or_nothing %}DOUBLE OR NOTHING {%endif%}</h5>
 	</div>
 	<div class="card-body">
 		<div class="row">
