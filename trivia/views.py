@@ -85,18 +85,21 @@ def submit_answers(request, game_id, round_num):
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
     team = Team.objects.get(name =request.session.get('team_name'), game=game )
+    
     for question in questions:
-        a = "Did not submit answers in time"
-        if round.active:
-            a = request.POST['a{}'.format(question.question_num)]
-        answer = T_Answer(answer = a, question = question, team=team)
-        answer.save()
+        #If they haven't submitted yet, T_Answer object won't exist
+        if not T_Answer.objects.filter(question = question, team = team).exists():
+            a = "Did not submit answers in time"
+            if round.active:
+                a = request.POST['a{}'.format(question.question_num)]
+            answer = T_Answer(answer = a, question = question, team=team)
+            answer.save()
     
     if request.POST.get('double') and not request.session.get('double', False) and round.active:
         team.double_round = round.round_num
         team.save()
         request.session['double']=round.round_num
-    
+        
     request.session['answered'] = round.round_num
     request.session["{}".format(round.round_num)] = True
     return HttpResponseRedirect(reverse('game', args=(game_id,)))
