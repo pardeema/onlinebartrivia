@@ -133,7 +133,7 @@ def admin_round(request, game_id, round_num):
 
     for team in teams:
         try:
-            ta = {team.name: [T_Answer.objects.get(question=q, team=team) for q in questions]}
+            ta = {team: [T_Answer.objects.get(question=q, team=team) for q in questions]}
             context.setdefault('team_answers', []).append(ta)
         except:
             continue
@@ -238,7 +238,7 @@ def admin_score(request, game_id, round_num):
 
     for team in teams:
         try:
-            ta = {team.name: [T_Answer.objects.get(question=q, team=team) for q in questions]}
+            ta = {team: [T_Answer.objects.get(question=q, team=team) for q in questions]}
             context.setdefault('team_answers', []).append(ta)
         except:
             continue
