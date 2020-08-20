@@ -14,7 +14,7 @@
 			<h3>VIEW ONLY</h3>
 			{%else %}
 			<h3>Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
-			<h4>Your current score: <b>{{team.score}}</b></h4>
+			<h4>Your current score: <b>{{team.score.normalize}}</b></h4>
 			{% endif %}
 		</div>
 		<div class="card-body">
