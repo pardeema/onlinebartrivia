@@ -38,12 +38,16 @@
         {% for team in team_answers %}
             <div class="card border-secondary">
                 <div class="card-header">
-                    {%for name in team%}
+                    {%for t in team%}
                         
-                        <h2 class="card-title"><u>Team:</u> {{name}}</h2>
+                        <h2 class="card-title"><u>Team:</u> {{t.name}}</h2>
+
+                    {%if t.double_round == round.round_num %}
+                        <h3>THIS ROUND HAS BEEN DOUBLED</h3>
+                    {%endif%}
                     <form method="POST" action="{%url 'edit_score' game.password round.round_num %}">
                         {% csrf_token %}
-                        <input type="hidden" name="team" value="{{name}}">
+                        <input type="hidden" name="team" value="{{t.name}}">
                     {%endfor%}
                 </div>
                 <table class="table table-bordered table-sm table-hover">
