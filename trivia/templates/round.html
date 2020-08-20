@@ -12,7 +12,7 @@
 			<h3 class="card-title">VIEW ONLY</h3>
 		{%else %}
 			<h3 class="card-title">Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
-			<h4 class="card-title">Your current score: <b>{{team.score}}</b></h4>
+			<h4 class="card-title">Your current score: <b>{{score.normalize}}</b></h4>
 		{% endif %}
 		<a href="{% url 'game' game.password %}"><button class="btn btn-info btn-lg">Back to Game</button></a><br><br>
 		{%if round.url %}

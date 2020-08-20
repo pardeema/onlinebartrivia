@@ -67,7 +67,7 @@
                                 <td class="center">{{a.question.answer}}</td> 
                                 <td class="center">{{a.answer}}</td>
                                 <td class="center"><input type="checkbox" id="check{{a.question.question_num}}" name="a{{a.question.question_num}}_correct" {%if a.correct %}checked {%endif%}></td>
-                                <td class="center"><input type="text" name="a{{a.question.question_num}}" id="points{{a.question.question_num}}" value="{{a.points}}" size=2></td>
+                                <td class="center"><input type="text" name="a{{a.question.question_num}}" id="points{{a.question.question_num}}" value="{{a.points.normalize}}" size=2></td>
                             </tr>
                         {%endif%}
                     {%endfor%}

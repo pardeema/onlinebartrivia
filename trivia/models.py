@@ -37,7 +37,7 @@ class Question(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=140)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    score = models.IntegerField(default=0)
+    score = models.DecimalField(default=0, max_digits=4, decimal_places=1)
     double_round = models.IntegerField(default=0)
 
     class Meta:
@@ -49,7 +49,7 @@ class Team(models.Model):
 class T_Answer(models.Model):
     answer = models.CharField(max_length=255)
     correct = models.BooleanField(default=False)
-    points = models.IntegerField(default=0)
+    points = models.DecimalField(default=0, max_digits=2, decimal_places=1)
     scored = models.BooleanField(default = False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete = models.CASCADE)

@@ -77,6 +77,7 @@ def round(request, game_id, round_num):
     if request.session.get("{}".format(round.round_num), False):
         team = Team.objects.get(name=request.session['team_name'], game=game)
         context['team_answers'] = [T_Answer.objects.get(team=team, question=q) for q in questions]
+        context['score'] = team.score
 
     return render(request, 'round.html', context)
 
@@ -209,14 +210,14 @@ def admin_score(request, game_id, round_num):
     if request.method=='POST':
         #Get team we're scoring and current score
         team = Team.objects.get(game=game, name=request.POST['team'])
-        score = team.score
+        score = float(team.score)
         temp_score=0
         answers = T_Answer.objects.filter(team=team, question__round = round)
         for answer in answers:
             num = answer.question.question_num
             #Tally correct answers
             if request.POST.get("a{}_correct".format(num), False) and not answer.scored:
-                pts = int(request.POST.get("a{}".format(num), 0 ))
+                pts = float(request.POST.get("a{}".format(num), 0 ))
                 temp_score += pts
                 answer.points = pts
                 answer.correct = True
@@ -270,7 +271,7 @@ def admin_edit_score(request, game_id, round_num):
     if request.method=='POST':
         #Get team we're scoring and current score
         team = Team.objects.get(game=game, name=request.POST['team'])
-        score = team.score
+        score = float(team.score)
         temp_score=0
         subtract_score=0
         answers = T_Answer.objects.filter(team=team, question__round = round)
@@ -279,11 +280,11 @@ def admin_edit_score(request, game_id, round_num):
             num = answer.question.question_num
             #Gotta make sure to subtract prev score
             if answer.correct:
-                subtract_score += answer.points
+                subtract_score += float(answer.points)
 
             #Tally correct answers
             if request.POST.get("a{}_correct".format(num), False) and answer.scored:
-                pts = int(request.POST.get("a{}".format(num), 0))
+                pts = float(request.POST.get("a{}".format(num), 0))
                 temp_score += pts
                 answer.points = pts
                 answer.correct = True
