@@ -42,9 +42,9 @@
 								<label class="card-text" for="pts{{answer.question.question_num}}"><b>Points:</b></label><br>
 								<button class="card-text btn btn-outline-primary" id="pts{{answer.question.question_num}}" onclick="return false;">
 									{%if round.round_num == request.session.double %}
-										{{answer.points|add:answer.points}}
+    									{{answer.points|add:answer.points}}
 									{%else %}
-										{{answer.points }}
+										{{answer.points.normalize }}
 									{%endif%}
 								</button>
 							</div>
