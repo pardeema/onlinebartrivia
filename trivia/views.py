@@ -153,8 +153,9 @@ def add_round(request, game_id):
                         description = request.POST.get('description', None),
                         game = game)
         r.save()
-        #There will be 8 items so iterate through that -- ew, magic numbers
-        for i in range(1, 9):
+        #Adjust to start from 1 instead of 0 since questions start 1. Num sent along in form to say how many Q/Answers
+        num_questions = int(request.POST['num'])
+        for i in range(1, num_questions+1):
             q = Question(question_num=i, 
                         question=request.POST['q{}'.format(i)],
                         answer = request.POST['a{}'.format(i)],

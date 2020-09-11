@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{%load mathfilters %}
+
 {% block home_nav %}
       <li class="nav-item active">
         <a class="nav-link" href="{% url 'game' game.password %}">Game Home <span class="sr-only">(current)</span></a>
@@ -42,7 +44,9 @@
 								<label class="card-text" for="pts{{answer.question.question_num}}"><b>Points:</b></label><br>
 								<button class="card-text btn btn-outline-primary" id="pts{{answer.question.question_num}}" onclick="return false;">
 									{%if round.round_num == request.session.double %}
-    									{{answer.points|add:answer.points}}
+    									{% with pts=answer.points|mul:2 %}
+										{{pts.normalize}}
+										{%endwith%}
 									{%else %}
 										{{answer.points.normalize }}
 									{%endif%}
