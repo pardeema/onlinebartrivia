@@ -11,6 +11,11 @@
 <div class="card border-info mb-3">
 	<div class="form-group card-body">
 	<h4 class="card-title">Create Round</h4>
+
+		<label for="q"><b># Questions</b></label><br>
+		<input type="integer" id="q" name="q"><br>
+		<button type="#" class="btn btn-outline-secondary" onclick="addFields()">Submit</button><br><br><br>
+	
 	<form method="POST">
 		
 		{% csrf_token %}
@@ -22,6 +27,8 @@
 		<input class="form-control" type="text" placeholder="URL" id="url" name="url"><br>
 		<label for="description"><b>Description for Round:</b></label><br>
 		<input class="form-control" type="text" placeholder="Description here" id="description" name="description"><br>
+		<input type="hidden" name="num" id="num" value="8">
+		<div id="questions">
 		{% for i in "12345678" %}
 			<div class="form-group row">
 				<div class="col-6">
@@ -36,9 +43,58 @@
 				</div>
 			</div>
 		{% endfor %}
+		</div>
+
 		<button type="submit" class="btn btn-info">Submit</button>
 
 	</form>
+	<script>
+			function addFields(){
+            var number = document.getElementById("q").value;
+            var container = document.getElementById("questions");
+            while (container.hasChildNodes()) {
+                container.removeChild(container.lastChild);
+            }
+            for (i=0;i<number;i++){
+                document.getElementById("num").value = (i+1);
+				
+				var row = container.appendChild(document.createElement("div"));
+				row.className +="form-group row";
+
+				var col1 = row.appendChild(document.createElement("div"));
+				col1.className +="col-6";
+
+				var q_label = document.createElement("Label");
+				q_label.setAttribute("for", "q"+(i+1));
+				q_label.innerHTML = "<b>Question "+(i+1)+"</b>";
+				col1.appendChild(q_label);
+
+                var ques = document.createElement("input");
+				ques.className += "form-control";
+                ques.type = "text";
+				ques.name= "q"+(i+1);
+				ques.id = "q"+(i+1);
+				
+				var col2 = row.appendChild(document.createElement("div"));
+				col2.className +="col-6";
+
+				var a_label = document.createElement("Label");
+				a_label.setAttribute("for", "a"+(i+1));
+				a_label.innerHTML = "<b>Answer "+(i+1)+"</b>";
+				col2.appendChild(a_label);
+
+				var ans = document.createElement("input");
+				ans.className += "form-control";
+				ans.type="text";
+				ans.name="a"+(i+1);
+				ans.id="a"+(i+1);
+                
+				col1.appendChild(ques);
+				col2.appendChild(ans);
+                row.appendChild(document.createElement("br"));
+            }
+        }
+		</script>
 	</div>
 </div>
 {% endblock content %}
