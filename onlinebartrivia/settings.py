@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'trivia',
-    'polls.apps.PollsConfig',
     'mathfilters',
     'django.contrib.admin',
     'django.contrib.auth',
