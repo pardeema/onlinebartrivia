@@ -9,7 +9,7 @@ def index(request):
     return render(request, 'index.html')
 
 def list_games(request):
-    games = Game.objects.filter(active=True)
+    games = Game.objects.filter(active=True) | Game.objects.filter(registration_active=True)
     context = {}
     for game in games:
         teams = Team.objects.filter(game=game)
@@ -234,7 +234,12 @@ def add_round(request, game_id):
 @permission_required('is_superuser')
 def add_game(request):
     if request.method == 'POST':
-        g = Game(name=request.POST['name'], password=request.POST['g_id'].upper().strip(), date=request.POST['date'], double_or_nothing=request.POST.get('double_or_nothing', False))
+        g = Game(name=request.POST['name'], 
+                password=request.POST['g_id'].upper().strip(), 
+                date=request.POST['date'], 
+                double_or_nothing=request.POST.get('double_or_nothing', False),
+                meeting_link=request.POST.get('meeting_url',''),
+                meeting_details = request.POST.get('meeting_details', ''))
         g.save()
         return HttpResponseRedirect(reverse('admin'))
     else:

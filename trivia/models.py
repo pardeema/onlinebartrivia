@@ -8,7 +8,12 @@ class Game(models.Model):
     active = models.BooleanField(default=False)
     registration_active = models.BooleanField(default=False)
     double_or_nothing = models.BooleanField(default=False)
+    meeting_link = models.URLField(blank=True)
+    meeting_details = models.CharField(max_length = 255, blank=True)
     
+    class Meta:
+        ordering = ['-date']
+
     def __str__(self):
         return self.password
         
