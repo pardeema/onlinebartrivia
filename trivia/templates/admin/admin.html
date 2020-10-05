@@ -26,11 +26,35 @@
 					<li class="list-group-item card-text"><b>{{game.name}}</b>   <a href="{% url 'game_details' game.password %}"><button class="btn btn-outline-info btn-sm float-right">Details</button></a></li>
 					<li class="list-group-item card-text"><b>Game Password:</b>  <button class="btn btn-dark float-right"><b>{{game.password}}</b></button></li>
 					<li class="list-group-item card-text"><b>Game Date:</b> {{game.date}} </li>
-					{% if game.active %} 
-						<li class="list-group item"> <a href="{% url 'toggle_game' game.password  %}"><button class="btn btn-primary btn-block">Active</button></a></li>
-					{% else %} 
-						<li class="list-group item"> <a href="{% url 'toggle_game' game.password  %}"><button class="btn btn-secondary btn-block">Inactive</button></a></li>
-					{%endif%}</li>
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-3">
+								<p class="card-text"><b>Game Status:</b></p>
+							</div>
+							<div class="col-9">
+								{% if game.active %} 
+									<a href="{% url 'toggle_game' game.password  %}"><button class="btn btn-primary btn-block">Active</button></a>
+								{% else %} 
+									<a href="{% url 'toggle_game' game.password  %}"><button class="btn btn-secondary btn-block">Inactive</button></a>
+								{%endif%}
+							</div>
+						</div>
+					</li>
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-6">
+								<p class="card-text"><b>Registration Status:</b></p>
+							</div>
+							<div class="col-6">
+								{% if game.registration_active %} 
+									<a href="{% url 'toggle_registration' game.password  %}"><button class="btn btn-info btn-block">Active</button></a>
+								{% else %} 
+									<a href="{% url 'toggle_registration' game.password  %}"><button class="btn btn-secondary btn-block">Inactive</button></a>
+								{%endif%}
+							</div>
+						</div>
+					</li>
+					
 				</ul>
 			</div>
 			<br><br>

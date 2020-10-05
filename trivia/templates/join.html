@@ -13,11 +13,12 @@
         {%endif%}
 
         <div class="card border-info mb-3" >
-            <div class="card-header">Join Game</div>
+            <div class="card-header"><h4>Join Team <b><u>{{team.name}}</b></u></h4></div>
             <div class="card-body">
-                <h4 class="card-title">Enter Game ID/password here:</h4>
-                <label for="game_id"><b>Game ID:</b></label><br>
-                <input class="form-control card-text" type="text" id="game_id" name="game_id" placeholder="Enter Game ID"><br>
+                <h4 class="card-title">Enter Team Access Code here:</h4>
+                <label for="team_pass"><b>Team Access Code:</b></label><br>
+                <input type="hidden" value="{{team.pk}}" name="id">
+                <input class="form-control card-text" type="text" id="team_pass" name="team_pass" placeholder="Enter Team Access Code"><br>
                 <button type="submit" class="btn btn-info">Join Game!</button>
             </form>
             </div>

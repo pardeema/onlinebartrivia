@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'admin' %}">Admin Home <span class="sr-only">(current)</span></a>
+      </li>
+	  <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game_details' team.game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+{% block content %}
+
+{%if request.session.team_name %}
+
+<div class="row card border-info mb-3" id="submitter">
+    <div class="card-header"><h4>Edit Team</h4></div>
+    <div class="form-group card-body" id="submitter">
+        {% if error %}
+        <div class="alert alert-dismissible alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Error!</h4>
+            <p class="mb-0">{{error}}</p>
+        </div>
+        {%endif%}
+        {%if alert %}
+        <div class="alert alert-dismissible alert-primary">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Success!</h4>
+            <p class="mb-0">{{alert}}</p>
+        </div>
+        {%endif%}
+        <form method="POST">
+            {% csrf_token %}
+            <b><label class="card-text" for="team_name">Team Name:</label></b><br>
+            <input type="hidden" id="game_id" name="game_id" value="{{game.password}}"> 
+            <input type="hidden" id="member_nums" name="member_nums" value="{{members|length}}">
+            <input class="form-control card-text" type="text" name="team_name" required value="{{team.name}}"><br>
+            <label class="card-text" for="team_pass"><b>Team Passcode:</b> (used by you and teammates to join your team -- so don't use something sensitive!)</label><br>
+            <input class="form-control card-text" type="text" name="team_pass" required value="{{team.password}}"><br>
+            <a href="#"  class="btn btn-secondary" onclick="addInput()">+Add Member</a><br>
+                <div class="container" id="addMember">
+                    {%for member in members %}
+                    <div class="form-group row" id="memberInfo">
+                        <div class="col-6">
+                            <input type="text" class="form-control" id="memberName{{forloop.counter}}" name="memberName{{forloop.counter}}" value="{{member.name}}">
+                        </div>
+                        <div class="col-6">
+                            <input type="email" class="form-control" id="memberEmail{{forloop.counter}}" name="memberEmail{{forloop.counter}}" value="{{member.email}}">
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+            <input type="checkbox" required id="confirmteam">
+            <label for="confirmteam" class="card-text">This information is correct</b></label><br>
+            <button type="submit" class="btn btn-info">Submit</button><br><br>
+        </form>
+            <span><a href="{%url 'game_details' request.session.game_id%}" class="btn btn-primary">Back to Game</a></span>
+        <br><br><br>
+
+    </div>
+</div>
+
+<script>
+    var counter={{members|length}};
+    var limit = 6;
+    function addInput(){
+        var container = document.getElementById("addMember");
+        if (counter >= limit){
+            alert("You cannot add anymore members");
+        }else{
+            counter++;
+            document.getElementById("member_nums").value=counter;
+            var row = container.appendChild(document.createElement('div'));
+            row.className += "form-group row";
+
+            var col1 = row.appendChild(document.createElement("div"));
+            col1.className+="col-6";
+
+            var memName = document.createElement("input");
+            memName.className += "form-control";
+            memName.type = "text";
+            memName.name = "memberName"+counter;
+            memName.id = "memberName"+counter;
+            memName.placeholder = "Enter Member Name";
+
+            var col2 = row.appendChild(document.createElement("div"));
+            col2.className += "col-6";
+
+            var memEmail = document.createElement("input");
+            memEmail.className += "form-control";
+            memEmail.type = "email";
+            memEmail.name = "memberEmail"+counter;
+            memEmail.id = "memberEmail"+counter;
+            memEmail.placeholder = "Enter Member Email";
+
+            col1.appendChild(memName);
+            col2.appendChild(memEmail);
+            row.appendChild(document.createElement("br"));
+        }
+    }
+</script>
+{%endif%}
+
+{% endblock content %}

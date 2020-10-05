@@ -18,23 +18,32 @@ def list_games(request):
 
 def join_game(request):
     error=''
-    if request.method=='POST':
-        game_id = request.POST['game_id'].upper().strip()
-        game = Game.objects.filter(password = game_id)
-        if game.exists():
-            game = Game.objects.get(password = game_id)
-            if game.active:
+    team_id = request.GET.get('team_id', False)
+    if not team_id:
+        return HttpResponseRedirect(reverse('list'))
+
+    else:
+        team = get_object_or_404(Team, pk=team_id)
+        if request.method=='POST':
+            team_id = request.POST['id'].strip()
+            team = get_object_or_404(Team, pk=team_id)
+            game = team.game
+            if game.active and team.password == request.POST['team_pass'].strip():
                 #Send to game + Store gameID in session
                 request.session['game_id'] = game.password
-                return HttpResponseRedirect(reverse('set_team', args=(game.password,)))
-            else:
+                request.session['team_name'] = team.name
+                return HttpResponseRedirect(reverse('game', args=(game.password,)))
+            elif not game.active:
                 error = "Game is not active. Please join once Quizmaster indicates."
-                return render(request, 'join.html', {'error': error})
-        else:
-            error = "Game does not exist! Check your code and try again"
-            return render(request, 'join.html', {'error': error})
+                return render(request, 'join.html', {'error': error, 'team':team})
+            elif not (team.password == request.POST['team_pass'].strip()):
+                error = "Team Passcode is Incorrect! Try again"
+                return render(request, 'join.html', {'error': error, 'team':team})
+            else:
+                error = "Something went wrong. Try again and contact the Quizmaster for more details."
+                return redner(request, 'join.html', {'error': error, 'team': team})
 
-    return render(request, 'join.html', {'error': error})
+        return render(request, 'join.html', {'error': error, 'team':team})
 
 def register_team(request):
     if request.method=="POST":
@@ -244,6 +253,17 @@ def toggle_game(request, game_id):
 
 @login_required
 @permission_required('is_superuser')
+def toggle_registration(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    if game.registration_active:
+        game.registration_active = False
+    else:
+        game.registration_active = True
+    game.save()
+    return HttpResponseRedirect(reverse('admin'))
+
+@login_required
+@permission_required('is_superuser')
 def toggle_round(request, game_id, round_num):
     game = get_object_or_404(Game, password=game_id)
     round  = Round.objects.get(game=game, round_num=round_num)
@@ -373,3 +393,35 @@ def scoreboard(request, game_id):
     context = {"teams": teams, 'game':game}
 
     return render(request, "admin/scoreboard.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def admin_view_teams(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams, 'game':game}
+
+    return render(request, "admin/view_teams.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def admin_edit_team(request, game_id):
+    team = get_object_or_404(Team, pk=request.GET['team_id'])
+    context={"team":team}
+    if request.method == "POST":
+        #update team info
+        team.name = request.POST['team_name']
+        team.password = request.POST['team_pass']
+        team.save()
+        #Delete members and save news (a little duplicative, but oh well)
+        T_Member.objects.filter(team=team).delete()
+        for i in range(int(request.POST['member_nums'])):
+            memName = request.POST['memberName{}'.format(i+1)].strip()
+            memEmail = request.POST['memberEmail{}'.format(i+1)].strip()            
+            member = T_Member(name=memName, email=memEmail, team=team)
+            member.save()
+            context['alert']="Team edited successfully"
+    
+    members = [member for member in T_Member.objects.filter(team=team)]
+    context['members']=members
+    return render(request, 'admin/edit_team.html', context)
