@@ -9,8 +9,11 @@ def index(request):
     return render(request, 'index.html')
 
 def list_games(request):
-    games = Game.objects.all()
-    context = {'games': games}
+    games = Game.objects.filter(active=True)
+    context = {}
+    for game in games:
+        teams = Team.objects.filter(game=game)
+        context.setdefault('results', []).append({'game':game, 'teams':teams})
     return render(request, 'list.html', context)
 
 def join_game(request):

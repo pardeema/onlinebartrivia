@@ -8,22 +8,35 @@
 	</div>
 	<div class="card-body">
 		<h2 class="card-title">Games</h2>
-		<p class="card-text"> Below is a list of currently active games. If there are none listed, wait until the Quizmaster indicates the game is live</p>
-		{% for game in games %}
-			{% if game.active %}
-					<div class="card border-secondary " style="width: 18rem;" >
-						<ul class="list-group list-group-flush">
+		<p class="card-text"> Below is a list of currently active games.</p><br>
+		{% for result in results %}
+			<div class="card border-info " style="width: 18rem;" >
+				<ul class="list-group list-group-flush">
+					<h5 class="list-group-item"><b>Game: {{result.game.name}}</b></h5>
+					<li class="list-group-item"><b>Date: {{result.game.date}}</b></li>
+					{%if result.game.registration_active %}
+						<li class="list-group-item"><a href="{%url 'register' %}" class="btn btn-outline-primary btn-block">Register Now!</a></li>
+					{%endif%}
+			{%for team in result.teams %}
+					<li class="list-group-item">
+						<div class='row'>	
+							<div class='col-6'>
+								<b>Team: {{team.name}}</b>
+							</div>
+							<div class='col-6'>
+								<a href="{%url 'join_game' %}?team_id={{team.pk}}" class="btn btn-info btn-block">Join Team!</a>
+							</div>
+						</div>
+					</li>
+			{%endfor%}
 
-							<li class="list-group-item"><b>Game: {{game.name}}</b></li>
-							<li class="list-group-item"><b>Game Date: </b> {{game.date}}</li>
-							<li class="list-group-item"><a href="{%url 'join_game' %}"><button class="btn btn-info btn-block">Join Now!</button></a></li>
-						</ul>
-					</div>
-					<br>
-			{%endif%}
-			
-		{% endfor %}
+				</ul>
+			</div>
+			<br>
+		{% empty %}
+			<p class="card-text"> Sorry, there are currently no active games. Please wait until the Quizmaster has indicated the game is live</p>
 	</div>
 </div>
+		{%endfor%}
 
 {% endblock content %}
