@@ -64,6 +64,27 @@ def register_team(request):
     else:
         return render(request, 'register_team.html')
 
+def edit_team(request):
+    team = get_object_or_404(Team, name=request.session['team_name'])
+    context={"team":team}
+    if request.method == "POST":
+        #update team info
+        team.name = request.POST['team_name']
+        team.password = request.POST['team_pass']
+        team.save()
+        #Delete members and save news (a little duplicative, but oh well)
+        T_Member.objects.filter(team=team).delete()
+        for i in range(int(request.POST['member_nums'])):
+            memName = request.POST['memberName{}'.format(i+1)].strip()
+            memEmail = request.POST['memberEmail{}'.format(i+1)].strip()            
+            member = T_Member(name=memName, email=memEmail, team=team)
+            member.save()
+            context['alert']="Team edited successfully"
+    
+    members = [member for member in T_Member.objects.filter(team=team)]
+    context['members']=members
+    return render(request, 'edit_team.html', context)
+
 def game_home(request, game_id):
     if request.session.get('team_name', False):
         game = get_object_or_404(Game, password = game_id)
