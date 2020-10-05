@@ -33,6 +33,28 @@ def join_game(request):
 
     return render(request, 'join.html', {'error': error})
 
+def register_team(request):
+    if request.method=="POST":
+        team_name = request.POST['team_name'].strip()
+        team_pass = request.POST['team_pass'].strip()
+        game_id = request.POST['game_id'].strip()
+        game = get_object_or_404(Game, password=game_id)
+        if Team.objects.filter(game__password=game_id, name=team_name).exists():
+                return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another", "game": game})
+        team = Team(game=game, name=team_name, password=team_pass)
+        team.save()
+        request.session.set_expiry(21600)
+        request.session['game_id'] = game_id
+        request.session['team_name'] = team_name
+        return render(request, 'register_success.html', {'team': team})
+        
+    elif request.GET.get('game_id', False):
+        id = request.GET['game_id'].upper().strip()
+        game = get_object_or_404(Game, password = id)
+        return render(request, 'register_team.html', {"game": game})
+    else:
+        return render(request, 'register_team.html')
+
 def game_home(request, game_id):
     if request.session.get('team_name', False):
         game = get_object_or_404(Game, password = game_id)

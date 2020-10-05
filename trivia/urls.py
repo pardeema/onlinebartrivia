@@ -6,6 +6,7 @@ urlpatterns = [
 	path('', views.index, name='index'),
     path('list/', views.list_games, name='list'),
     path('join/', views.join_game, name='join_game'),
+    path('register/', views.register_team, name='register'),
     path('game/<str:game_id>/', views.game_home, name='game'),
     path('game/<str:game_id>/round/<int:round_num>/', views.round, name='round'),
     path('game/<str:game_id>/set_team', views.set_team, name='set_team'),

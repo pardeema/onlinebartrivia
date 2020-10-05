@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row card border-info mb-3">
+    <div class="card-header"><h3>Register Team - Success!</h4></div>
+    <div class="form-group card-body">
+        <h4 class="card-header">Congrats! You're registered for the game! Your details are below:</h4>
+
+        <p class="card-text">
+            <ul>
+                <li><b>Team Name:</b> {{team.name}}</li>
+                <li><b>Team Code:</b> {{team.password}}</li>
+                <li><b>Game Details</b>:</li> 
+                    <ul>
+                        <li>Game ID: {{team.game.password}}</li>
+                        <li>Game Date: {{team.game.date}}</li>
+                    </ul>
+            </ul>
+        </p>
+
+        <h5><a href="{%url 'game' request.session.game_id %}">Go to Game Page</a></h5>
+    </div>
+</div>
+
+{% endblock content %}

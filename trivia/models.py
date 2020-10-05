@@ -39,13 +39,22 @@ class Team(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     score = models.DecimalField(default=0, max_digits=4, decimal_places=1)
     double_round = models.IntegerField(default=0)
+    password = models.CharField(max_length=140, blank=False)
 
     class Meta:
         ordering = ['game', 'score']
 
     def __str__(self):
         return self.name
-    
+
+class T_Member(models.Model):
+    name = models.CharField(max_length=140)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    email = models.EmailField(blank=True)
+
+    def __str__(self):
+        return "{}: {}".format(self.name, self.email)
+
 class T_Answer(models.Model):
     answer = models.CharField(max_length=255)
     correct = models.BooleanField(default=False)
