@@ -10,6 +10,12 @@
             <ul>
                 <li><b>Team Name:</b> {{team.name}}</li>
                 <li><b>Team Code:</b> {{team.password}}</li>
+                <li><b>Members:</b></li>
+                        {%for member in members%}
+                            <ul>
+                                <li><b>Name:</b> {{member.name}}   <span><b>Email:</b> {{member.email}}</li>
+                            </ul>
+                        {%endfor%}
                 <li><b>Game Details</b>:</li> 
                     <ul>
                         <li>Game ID: {{team.game.password}}</li>

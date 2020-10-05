@@ -43,10 +43,19 @@ def register_team(request):
                 return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another", "game": game})
         team = Team(game=game, name=team_name, password=team_pass)
         team.save()
+
+        members=[]
+        for i in range(int(request.POST['member_nums'])):
+            memName = request.POST['memberName{}'.format(i+1)].strip()
+            memEmail = request.POST['memberEmail{}'.format(i+1)].strip()
+            member = T_Member(name=memName, email=memEmail, team=team)
+            member.save()
+            members.append(member)
+
         request.session.set_expiry(21600)
         request.session['game_id'] = game_id
         request.session['team_name'] = team_name
-        return render(request, 'register_success.html', {'team': team})
+        return render(request, 'register_success.html', {'team': team, 'members':members})
         
     elif request.GET.get('game_id', False):
         id = request.GET['game_id'].upper().strip()
