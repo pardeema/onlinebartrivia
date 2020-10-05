@@ -10,8 +10,9 @@
 		<h2 class="card-title">Games</h2>
 		<p class="card-text"> Below is a list of currently active games.</p><br>
 		{% for result in results %}
-			<div class="card border-info " style="width: 18rem;" >
-				<ul class="list-group list-group-flush">
+			<div class="card border-info" style="width: 25rem;" >
+				<button data-toggle="collapse" data-target="#card{{forloop.counter}}" class="btn btn-outline-info">Collapse</button>
+				<ul class="list-group list-group-flush collapse show" id="card{{forloop.counter}}" aria-expanded="true">
 					<h5 class="list-group-item"><b>Game: {{result.game.name}}</b></h5>
 					<li class="list-group-item"><b>Date: {{result.game.date}}</b></li>
 					{%if result.game.registration_active %}

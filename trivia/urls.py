@@ -25,6 +25,9 @@ urlpatterns = [
         path('game/<str:game_id>/scoreboard', views.scoreboard, name='scoreboard'),
         path('game/<str:game_id>/round<int:round_num>/edit_score', views.admin_edit_score, name='edit_score'),
         path('game/<str:game_id>/view_teams', views.admin_view_teams, name='admin_view_teams'),
-        path('game/<str:game_id>/edit_team', views.admin_edit_team, name='admin_edit_team')
+        path('game/<str:game_id>/edit_team', views.admin_edit_team, name='admin_edit_team'),
+        path('game/<str:game_id>/export_breakout_rooms', views.export_breakout_rooms, name='export_rooms'),
+        path('game/<str:game_id>/export_teams', views.export_teams, name='export_teams'),
+        path('game/<str:game_id>/delete_team', views.delete_team, name='delete_team')
         ])),
 ]

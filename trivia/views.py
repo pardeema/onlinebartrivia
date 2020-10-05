@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from .models import *
+import csv
 
 def index(request):
     request.session.set_expiry(21600)
@@ -410,6 +411,16 @@ def admin_view_teams(request, game_id):
 
 @login_required
 @permission_required('is_superuser')
+def delete_team(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    Team.objects.get(pk=request.GET['team_id']).delete()
+    context = {"teams": teams, 'game':game, 'alert':"Team deleted successfully"}
+
+    return render(request, "admin/view_teams.html", context)
+
+@login_required
+@permission_required('is_superuser')
 def admin_edit_team(request, game_id):
     team = get_object_or_404(Team, pk=request.GET['team_id'])
     context={"team":team}
@@ -430,3 +441,42 @@ def admin_edit_team(request, game_id):
     members = [member for member in T_Member.objects.filter(team=team)]
     context['members']=members
     return render(request, 'admin/edit_team.html', context)
+
+@login_required
+@permission_required('is_superuser')
+def export_breakout_rooms(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams, 'game':game}
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="breakout_preassign.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Pre-assign Room Name', 'Email Address'])
+    for team in teams:
+        members = T_Member.objects.filter(team=team)
+        for member in members:
+            writer.writerow([team.name, member.email])
+
+    return response
+
+@login_required
+@permission_required('is_superuser')
+def export_teams(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams, 'game':game}
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="team_list.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Team', 'Name', 'Email Address'])
+    for team in teams:
+        members = T_Member.objects.filter(team=team)
+        for member in members:
+            writer.writerow([team.name, member.name, member.email])
+
+    return response
+

@@ -48,7 +48,7 @@ class Team(models.Model):
     password = models.CharField(max_length=140, blank=False)
 
     class Meta:
-        ordering = ['game', 'score']
+        ordering = ['game', 'name', 'score']
 
     def __str__(self):
         return self.name

@@ -12,11 +12,22 @@
 
 <div class="card border-info mb-3">
 	<div class="card-header">
-		<h1>Trivia Home</h1>
+		<h1>View Teams</h1>
 	</div>
 	<div class="card-body">
-		<h2 class="card-title">Teams</h2>
-		<p class="card-text"> Game: <u>{{game.password}}</u></p><br>
+		<h2 class="card-title">Game: <u>{{game.password}}</u></h2>
+			<div class="row">
+				<div class="col-6">
+					<div class="row">
+						<div class="col-7">
+							<a href="{%url 'export_rooms' game.password %}" class="btn btn-primary">Export Breakout Rooms</a>
+						</div>
+						<div class="col-5">
+							<a href="{%url 'export_teams' game.password %}" class="btn btn-info">Export Teams</a>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="card border-info " style="width: 18rem;" >
 				<ul class="list-group list-group-flush">
 			{% for team in teams %}
