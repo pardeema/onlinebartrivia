@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block home_nav %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game' team.game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+{% block content %}
+<div class="card mb-3 border-info">
+  <div class="card-body">
+    <h5 class="card-title">Registered!</h5>
+    <p class="card-text">Congrats! You're registered for the game! The details are below.</p>
+    <br><br>
+    <a href="{%url 'game' team.game.password %}" class="btn btn-primary">Go to Game</a><br>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-6">
+                <b>Team Name:</b>
+            </div>
+            <div class="col-6">
+                {{team.name}}
+            </div>
+        </div>
+    </li>
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-6">
+                <b>Team Access Code:</b>
+            </div>
+            <div class="col-6">
+                {{team.password}}
+            </div>
+        </div>
+    </li>
+    {% if team.game.meeting_link %}
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-6">
+                <b>Meeting URL:</b>
+            </div>
+            <div class="col-6">
+                <a href="{{team.game.meeting_link}}">{{team.game.meeting_link}}</a>
+            </div>
+        </div>
+    </li>
+    {%endif%}
+    {%if team.game.meeting_details %}
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-6">
+                <b>Meeting Details:</b>
+            </div>
+            <div class="col-6">
+                {{team.game.meeting_details}}
+            </div>
+        </div>
+    </li>
+    {%endif%}
+    </ul>
+    <div class="card-body">
+        <p class="card-text">The following Members have been registered:</p>
+    </div>
+    <ul class="list-group list-group-flush">
+        {% for member in members %}
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col-6">
+                    <div class="row border-primary">
+                        <div class="col-6">
+                            <b>Member Name:</b>
+                        </div>
+                        <div class="col-6">
+                            {{member.name}}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-6">
+                            <b>Member Email:</b>
+                        </div>
+                        <div class="col-6">
+                            {{member.email}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+        {%endfor%}
+    </ul>
+</div>
+
+{% endblock content %}

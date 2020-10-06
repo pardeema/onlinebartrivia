@@ -3,48 +3,112 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from .models import *
+import csv
 
 def index(request):
     request.session.set_expiry(21600)
     return render(request, 'index.html')
 
 def list_games(request):
-    games = Game.objects.all()
-    context = {'games': games}
+    games = Game.objects.filter(active=True) | Game.objects.filter(registration_active=True)
+    context = {}
+    for game in games:
+        teams = Team.objects.filter(game=game)
+        context.setdefault('results', []).append({'game':game, 'teams':teams})
     return render(request, 'list.html', context)
 
 def join_game(request):
     error=''
-    if request.method=='POST':
-        game_id = request.POST['game_id'].upper().strip()
-        game = Game.objects.filter(password = game_id)
-        if game.exists():
-            game = Game.objects.get(password = game_id)
-            if game.active:
+    team_id = request.GET.get('team_id', False)
+    if not team_id:
+        return HttpResponseRedirect(reverse('list'))
+
+    else:
+        team = get_object_or_404(Team, pk=team_id)
+        if request.method=='POST':
+            team_id = request.POST['id'].strip()
+            team = get_object_or_404(Team, pk=team_id)
+            game = team.game
+            if game.active and team.password == request.POST['team_pass'].strip():
                 #Send to game + Store gameID in session
                 request.session['game_id'] = game.password
-                return HttpResponseRedirect(reverse('set_team', args=(game.password,)))
-            else:
+                request.session['team_name'] = team.name
+                return HttpResponseRedirect(reverse('game', args=(game.password,)))
+            elif not game.active:
                 error = "Game is not active. Please join once Quizmaster indicates."
-                return render(request, 'join.html', {'error': error})
-        else:
-            error = "Game does not exist! Check your code and try again"
-            return render(request, 'join.html', {'error': error})
+                return render(request, 'join.html', {'error': error, 'team':team})
+            elif not (team.password == request.POST['team_pass'].strip()):
+                error = "Team Passcode is Incorrect! Try again"
+                return render(request, 'join.html', {'error': error, 'team':team})
+            else:
+                error = "Something went wrong. Try again and contact the Quizmaster for more details."
+                return redner(request, 'join.html', {'error': error, 'team': team})
 
-    return render(request, 'join.html', {'error': error})
+        return render(request, 'join.html', {'error': error, 'team':team})
+
+def register_team(request):
+    if request.method=="POST":
+        team_name = request.POST['team_name'].strip()
+        team_pass = request.POST['team_pass'].strip()
+        game_id = request.POST['game_id'].strip()
+        game = get_object_or_404(Game, password=game_id)
+        if Team.objects.filter(game__password=game_id, name=team_name).exists():
+                return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another", "game": game})
+        team = Team(game=game, name=team_name, password=team_pass)
+        team.save()
+
+        members=[]
+        for i in range(int(request.POST['member_nums'])):
+            memName = request.POST['memberName{}'.format(i+1)].strip()
+            memEmail = request.POST['memberEmail{}'.format(i+1)].strip()
+            member = T_Member(name=memName, email=memEmail, team=team)
+            member.save()
+            members.append(member)
+
+        request.session.set_expiry(21600)
+        request.session['game_id'] = game_id
+        request.session['team_name'] = team_name
+        return render(request, 'register_success.html', {'team': team, 'members':members})
+        
+    elif request.GET.get('game_id', False):
+        id = request.GET['game_id'].upper().strip()
+        game = get_object_or_404(Game, password = id)
+        return render(request, 'register_team.html', {"game": game})
+    else:
+        return render(request, 'register_team.html')
+
+def edit_team(request):
+    team = get_object_or_404(Team, name=request.session['team_name'])
+    context={"team":team}
+    if request.method == "POST":
+        #update team info
+        team.name = request.POST['team_name']
+        team.password = request.POST['team_pass']
+        team.save()
+        #Delete members and save news (a little duplicative, but oh well)
+        T_Member.objects.filter(team=team).delete()
+        for i in range(int(request.POST['member_nums'])):
+            memName = request.POST['memberName{}'.format(i+1)].strip()
+            memEmail = request.POST['memberEmail{}'.format(i+1)].strip()            
+            member = T_Member(name=memName, email=memEmail, team=team)
+            member.save()
+            context['alert']="Team edited successfully"
+    
+    members = [member for member in T_Member.objects.filter(team=team)]
+    context['members']=members
+    return render(request, 'edit_team.html', context)
 
 def game_home(request, game_id):
     if request.session.get('team_name', False):
         game = get_object_or_404(Game, password = game_id)
         rounds = Round.objects.filter(game = game)
-        if request.session['team_name'] == "Viewer":
-            team = None
-        else:
-            team = Team.objects.get(game=game, name=request.session['team_name'])
+        team = Team.objects.get(game=game, name=request.session['team_name'])
+        if team.double_round > 0:
+            request.session['double'] = team.double_round
         context = {'game':game, 'rounds':rounds, 'team':team}
         return render(request, 'game.html', context)
     else:
-        return HttpResponseRedirect(reverse('set_team', args=(game_id,)))
+        return HttpResponseRedirect(reverse('list'))
 
 def set_team(request, game_id):
     game = get_object_or_404(Game, password = game_id)
@@ -73,8 +137,17 @@ def round(request, game_id, round_num):
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
     context = {'game': game, 'round': round, 'questions': questions}
+    if not request.session.get('team_name', False):
+        return HttpResponseRedirect(reverse('list'))
+    
+    team = Team.objects.get(name=request.session['team_name'], game=game)
+    
+    #Check for if we already doubled and haven't set double detail in session (if someone refreshes on round after other player submits)
+    if team.double_round > 0 and not request.session.get('double', False):
+            request.session['double'] = team.double_round
 
-    if request.session.get("{}".format(round.round_num), False):
+    #Rounds answered can only be 0-9 at this point due to the way we're checking.
+    if str(round.round_num) in team.rounds_answered:
         team = Team.objects.get(name=request.session['team_name'], game=game)
         context['team_answers'] = [T_Answer.objects.get(team=team, question=q) for q in questions]
         context['score'] = team.score
@@ -86,23 +159,27 @@ def submit_answers(request, game_id, round_num):
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
     team = Team.objects.get(name =request.session.get('team_name'), game=game )
-    
+    submitted = False
+    if team.double_round == 0:
+        previously_doubled = False
     for question in questions:
         #If they haven't submitted yet, T_Answer object won't exist
-        if not T_Answer.objects.filter(question = question, team = team).exists():
+        submitted = T_Answer.objects.filter(question = question, team = team).exists()
+        if not submitted:
             a = "Did not submit answers in time"
             if round.active:
                 a = request.POST['a{}'.format(question.question_num)]
             answer = T_Answer(answer = a, question = question, team=team)
             answer.save()
     
-    if request.POST.get('double') and not request.session.get('double', False) and round.active:
+    if request.POST.get('double') and not previously_doubled and round.active:
         team.double_round = round.round_num
         team.save()
         request.session['double']=round.round_num
+
         
-    request.session['answered'] = round.round_num
-    request.session["{}".format(round.round_num)] = True
+    team.rounds_answered += str(round.round_num)
+    team.save()
     return HttpResponseRedirect(reverse('game', args=(game_id,)))
 
 #Below are ADMIN views
@@ -170,7 +247,12 @@ def add_round(request, game_id):
 @permission_required('is_superuser')
 def add_game(request):
     if request.method == 'POST':
-        g = Game(name=request.POST['name'], password=request.POST['g_id'].upper().strip(), date=request.POST['date'], double_or_nothing=request.POST.get('double_or_nothing', False))
+        g = Game(name=request.POST['name'], 
+                password=request.POST['g_id'].upper().strip(), 
+                date=request.POST['date'], 
+                double_or_nothing=request.POST.get('double_or_nothing', False),
+                meeting_link=request.POST.get('meeting_url',''),
+                meeting_details = request.POST.get('meeting_details', ''))
         g.save()
         return HttpResponseRedirect(reverse('admin'))
     else:
@@ -184,6 +266,17 @@ def toggle_game(request, game_id):
         game.active = False
     else:
         game.active = True
+    game.save()
+    return HttpResponseRedirect(reverse('admin'))
+
+@login_required
+@permission_required('is_superuser')
+def toggle_registration(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    if game.registration_active:
+        game.registration_active = False
+    else:
+        game.registration_active = True
     game.save()
     return HttpResponseRedirect(reverse('admin'))
 
@@ -318,3 +411,85 @@ def scoreboard(request, game_id):
     context = {"teams": teams, 'game':game}
 
     return render(request, "admin/scoreboard.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def admin_view_teams(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams, 'game':game}
+
+    return render(request, "admin/view_teams.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def delete_team(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    Team.objects.get(pk=request.GET['team_id']).delete()
+    context = {"teams": teams, 'game':game, 'alert':"Team deleted successfully"}
+
+    return render(request, "admin/view_teams.html", context)
+
+@login_required
+@permission_required('is_superuser')
+def admin_edit_team(request, game_id):
+    team = get_object_or_404(Team, pk=request.GET['team_id'])
+    context={"team":team}
+    if request.method == "POST":
+        #update team info
+        team.name = request.POST['team_name']
+        team.password = request.POST['team_pass']
+        team.save()
+        #Delete members and save news (a little duplicative, but oh well)
+        T_Member.objects.filter(team=team).delete()
+        for i in range(int(request.POST['member_nums'])):
+            memName = request.POST['memberName{}'.format(i+1)].strip()
+            memEmail = request.POST['memberEmail{}'.format(i+1)].strip()            
+            member = T_Member(name=memName, email=memEmail, team=team)
+            member.save()
+            context['alert']="Team edited successfully"
+    
+    members = [member for member in T_Member.objects.filter(team=team)]
+    context['members']=members
+    print(context)
+    return render(request, 'admin/edit_team.html', context)
+
+@login_required
+@permission_required('is_superuser')
+def export_breakout_rooms(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams, 'game':game}
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="breakout_preassign.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Pre-assign Room Name', 'Email Address'])
+    for team in teams:
+        members = T_Member.objects.filter(team=team)
+        for member in members:
+            writer.writerow([team.name, member.email])
+
+    return response
+
+@login_required
+@permission_required('is_superuser')
+def export_teams(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams, 'game':game}
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="team_list.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Team', 'Name', 'Email Address'])
+    for team in teams:
+        members = T_Member.objects.filter(team=team)
+        for member in members:
+            writer.writerow([team.name, member.name, member.email])
+
+    return response
+

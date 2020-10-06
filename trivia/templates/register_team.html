@@ -2,77 +2,111 @@
 
 {% block content %}
 
-<div class="row">
-    <div class="col collapse show card border-primary mb-3" style="max-width: 20rem;" id="toggle">
-        <div class="card-header">
-            <h4>View Only</h4>
+{%if game %}
+    {%if game.registration_active %}
+            
+        <div class="row card border-info mb-3" id="submitter">
+            <div class="card-header"><h4>Register Team</h4></div>
+            <div class="form-group card-body" id="submitter">
+                {% if error %}
+                <div class="alert alert-dismissible alert-warning">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <h4 class="alert-heading">Error!</h4>
+                    <p class="mb-0">{{error}}</p>
+                </div>
+                {%endif%}
+                <form method="POST">
+                    {% csrf_token %}
+                    <b><label class="card-text" for="team_name">Enter your team name:</label></b><br>
+                    <input type="hidden" id="game_id" name="game_id" value="{{game.password}}"> 
+                    <input type="hidden" id="member_nums" name="member_nums" value="1">
+                    <input class="form-control card-text" type="text" name="team_name" required placeholder="Enter Team Name"><br>
+                    <label class="card-text" for="team_pass"><b>Enter a Team Passcode:</b> (used by you and teammates to join your team -- so don't use something sensitive!)</label><br>
+                    <input class="form-control card-text" type="text" name="team_pass" required placeholder="Enter a Team Access Code"><br>
+                    <a href="#"  class="btn btn-secondary" onclick="addInput()">+Add Member</a><br>
+                        <div class="container" id="addMember">
+                            <div class="form-group row" id="memberInfo">
+                                <div class="col-6">
+                                    <input type="text" class="form-control" id="memberName1" name="memberName1" placeholder="Enter Member Name">
+                                </div>
+                                <div class="col-6">
+                                    <input type="email" class="form-control" id="memberEmail1" name="memberEmail1" placeholder="Enter Member Email">
+                                </div>
+                            </div>
+                        </div>
+                    <input type="checkbox" required id="confirmteam">
+                    <label for="confirmteam" class="card-text">This information is correct</b></label><br>
+                    <button type="submit" class="btn btn-info">Submit</button>
+                </form>
+                <br><br><br>
+
+            </div>
         </div>
-        <div class="card-body">
-            <p class='card-text'>Click if you want to only <b>VIEW</b> questions to help your team<br></p>
-            <button data-target="#toggle,#viewer" class="btn btn-primary" data-toggle="collapse">View Only</button>
+
+        <script>
+            var counter=1;
+            var limit = 6;
+            function addInput(){
+                var container = document.getElementById("addMember");
+                if (counter >= limit){
+                    alert("You cannot add anymore members");
+                }else{
+                    counter++;
+                    document.getElementById("member_nums").value=counter;
+                    var row = container.appendChild(document.createElement('div'));
+                    row.className += "form-group row";
+
+                    var col1 = row.appendChild(document.createElement("div"));
+                    col1.className+="col-6";
+
+                    var memName = document.createElement("input");
+                    memName.className += "form-control";
+                    memName.type = "text";
+                    memName.name = "memberName"+counter;
+                    memName.id = "memberName"+counter;
+                    memName.placeholder = "Enter Member Name";
+
+                    var col2 = row.appendChild(document.createElement("div"));
+                    col2.className += "col-6";
+
+                    var memEmail = document.createElement("input");
+                    memEmail.className += "form-control";
+                    memEmail.type = "email";
+                    memEmail.name = "memberEmail"+counter;
+                    memEmail.id = "memberEmail"+counter;
+                    memEmail.placeholder = "Enter Member Email";
+
+                    col1.appendChild(memName);
+                    col2.appendChild(memEmail);
+                    row.appendChild(document.createElement("br"));
+                }
+            }
+        </script>
+    {%else%}
+        <div class="card border-info mb-3">
+            <div class="card-header">
+                <h3>Registration is Currently Closed</h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text"> Registration for the game <b>{{game.name}}</b> scheduled for <b>{{game.date}}</b> is currently <b><u>CLOSED</u></b></p>
+                <br><br>
+                <p class="card-text"> Please contact support@onlinebartrivia.com if you need assistance. Thank you!</p>
+    {%endif%}
+{%else%}
+    <div class="form-group">
+        <div class="card border-info mb-3" >
+            <form method="GET">
+            <div class="card-header"><h3>Register Team</h3></div>
+            <div class="card-body">
+                <h4 class="card-title">Enter Game ID here:</h4>
+                <p class="card-text">Contact the Quizmaster if you don't know the Game ID</p>
+                <label for="game_id"><b>Game ID:</b></label><br>
+                <input class="form-control card-text" type="text" id="game_id" name="game_id" placeholder="Enter Game ID"><br>
+                <button type="submit" class="btn btn-info">Join Game!</button>
+            </form>
+            </div>
         </div>
     </div>
-    <div class="col collapse show card border-info mb-3" style="max-width: 20rem;" id="toggle">
-        <div class="card-header">
-                <h4>Team Submitter</h4>
-        </div>
-        <div class="card-boy">
-            <p class="card-text"> Click if you will be submitting answers tonight</p>
-            <p class="card-text"><b><u>NOTE:</u> Only one person per team should submit answers</b></p>
-            <button data-target="#toggle,#submitter" class="btn btn-info" data-toggle="collapse">I Will Submit Answers</button><br><br>
-        </div>
-    </div>
-</div>
+{%endif%}
 
-<div class="row collapse card border-primary mb-3" id="viewer">
-    <div class="card-header"><h4>View Only</h4></div>    
-    <div class="form-group collapse card-body" id="viewer">
-        <form method="POST">
-            <p class="card-text" >You're sure you want to <b><u>VIEW ONLY</u></b>?</p><br>
-            {% csrf_token %}
-            <input type ="hidden" name="team_name" value="Viewer">
-            <input type="checkbox" required id="viewonly">
-            <label for="viewonly" class="card-text">I am sure</label><br>
-            <button type="submit" class="btn btn-primary">View Only</button>
-        </form>
-        <br><br><br>
-        <p class="card-text"> Just Kidding...</p>
-        <button data-target="#submitter, #viewer" class="btn btn-outline-primary btn-sm" data-toggle="collapse">I want to Submit Answers</button>
-        
-    </div>
-</div>
-
-
-<div class="row collapse card border-info mb-3" id="submitter">
-    <div class="card-header"><h4>Team Submitter</h4></div>
-    <div class="form-group collapse card-body" id="submitter">
-        {% if error %}
-        <div class="alert alert-dismissible alert-warning">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <h4 class="alert-heading">Error!</h4>
-            <p class="mb-0">{{error}}</p>
-        </div>
-        {%endif%}
-        <form method="POST">
-            {% csrf_token %}
-            <b><label class="card-text" for="team_name">Great! Enter your team name:</label></b><br>
-            <input class="form-control card-text" type="text" name="team_name" placeholder="Enter Team Name"><br>
-            <input type="checkbox" required id="confirmteam">
-            <label for="confirmteam" class="card-text">I'm sure I will be <b>submitting answers</b></label><br>
-            <button type="submit" class="btn btn-info">Submit</button>
-        </form>
-        <br><br><br>
-        <p class="card-text">Just kidding...</p>
-        <a href="#viewer, #submitter" class="btn btn-outline-info btn-sm" data-toggle="collapse">I want to View Only</a>
-
-
-    </div>
-</div>
-    <div class="row collapse" id="submitter">
-    </div>
-<style>
-    .collapsing {
-        transition: none !important;
-    }
-</style>
 {% endblock content %}
