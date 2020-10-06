@@ -9,8 +9,6 @@
 {% endblock home_nav %}
 {% block content %}
 
-{%if request.session.team_name %}
-
 <div class="row card border-info mb-3" id="submitter">
     <div class="card-header"><h4>Edit Team</h4>
         <div class="row">
@@ -59,7 +57,7 @@
             <label for="confirmteam" class="card-text">This information is correct</b></label><br>
             <button type="submit" class="btn btn-info">Submit</button><br><br>
         </form>
-            <span><a href="{%url 'game_details' request.session.game_id%}" class="btn btn-primary">Back to Game</a></span>
+            <span><a href="{%url 'game_details' team.game.password%}" class="btn btn-primary">Back to Game</a></span>
         <br><br><br>
 
     </div>
@@ -104,6 +102,5 @@
         }
     }
 </script>
-{%endif%}
 
 {% endblock content %}

@@ -10,12 +10,9 @@
 <div class="card border-info mb-3">
 	<div class="card-body">
 		<h1 class="card-title">{{ game.name }} - {{game.date}}</h1>
-		{%if request.session.team_name == "Viewer" %}
-			<h3 class="card-title">VIEW ONLY</h3>
-		{%else %}
-			<h3 class="card-title">Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
-			<h4 class="card-title">Your current score: <b>{{score.normalize}}</b></h4>
-		{% endif %}
+		<h3 class="card-title">Your Team: <b><u>{{request.session.team_name}}</b></u></h3>
+		<h4 class="card-title">Your current score: <b>{{score.normalize}}</b></h4>
+
 		<a href="{% url 'game' game.password %}"><button class="btn btn-info btn-lg">Back to Game</button></a><br><br>
 		{%if round.url %}
 			<h5>URL for additional material:</h5>
@@ -57,20 +54,6 @@
 					{%endfor%}
 				</div>
 			</form>
-
-        {% elif request.session.team_name == "Viewer" and round.active %}
-		<h3 class="card-title"><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>
-
-		{%for question in questions %}
-			<div class="card border-secondary" >
-				<ul class="list-group list-group-flush">
-
-					<li class="list-group-item card-text"><b>Question #{{question.question_num}}</b></li>
-					<li class="list-group-item card-text">{{question.question}}</li>
-				</ul>
-			</div>
-			<br>
-		{%endfor%}
 
 		{% elif round.active %}
 		<h3 class="card-title"><b>Round #{{round.round_num}}</b> - {{round.round_name}}</h3>

@@ -102,14 +102,13 @@ def game_home(request, game_id):
     if request.session.get('team_name', False):
         game = get_object_or_404(Game, password = game_id)
         rounds = Round.objects.filter(game = game)
-        if request.session['team_name'] == "Viewer":
-            team = None
-        else:
-            team = Team.objects.get(game=game, name=request.session['team_name'])
+        team = Team.objects.get(game=game, name=request.session['team_name'])
+        if team.double_round > 0:
+            request.session['double'] = team.double_round
         context = {'game':game, 'rounds':rounds, 'team':team}
         return render(request, 'game.html', context)
     else:
-        return HttpResponseRedirect(reverse('set_team', args=(game_id,)))
+        return HttpResponseRedirect(reverse('list'))
 
 def set_team(request, game_id):
     game = get_object_or_404(Game, password = game_id)
@@ -138,8 +137,17 @@ def round(request, game_id, round_num):
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
     context = {'game': game, 'round': round, 'questions': questions}
+    if not request.session.get('team_name', False):
+        return HttpResponseRedirect(reverse('list'))
+    
+    team = Team.objects.get(name=request.session['team_name'], game=game)
+    
+    #Check for if we already doubled and haven't set double detail in session (if someone refreshes on round after other player submits)
+    if team.double_round > 0 and not request.session.get('double', False):
+            request.session['double'] = team.double_round
 
-    if request.session.get("{}".format(round.round_num), False):
+    #Rounds answered can only be 0-9 at this point due to the way we're checking.
+    if str(round.round_num) in team.rounds_answered:
         team = Team.objects.get(name=request.session['team_name'], game=game)
         context['team_answers'] = [T_Answer.objects.get(team=team, question=q) for q in questions]
         context['score'] = team.score
@@ -151,23 +159,27 @@ def submit_answers(request, game_id, round_num):
     round  = Round.objects.get(game=game, round_num=round_num)
     questions = Question.objects.filter(round = round)
     team = Team.objects.get(name =request.session.get('team_name'), game=game )
-    
+    submitted = False
+    if team.double_round == 0:
+        previously_doubled = False
     for question in questions:
         #If they haven't submitted yet, T_Answer object won't exist
-        if not T_Answer.objects.filter(question = question, team = team).exists():
+        submitted = T_Answer.objects.filter(question = question, team = team).exists()
+        if not submitted:
             a = "Did not submit answers in time"
             if round.active:
                 a = request.POST['a{}'.format(question.question_num)]
             answer = T_Answer(answer = a, question = question, team=team)
             answer.save()
     
-    if request.POST.get('double') and not request.session.get('double', False) and round.active:
+    if request.POST.get('double') and not previously_doubled and round.active:
         team.double_round = round.round_num
         team.save()
         request.session['double']=round.round_num
+
         
-    request.session['answered'] = round.round_num
-    request.session["{}".format(round.round_num)] = True
+    team.rounds_answered += str(round.round_num)
+    team.save()
     return HttpResponseRedirect(reverse('game', args=(game_id,)))
 
 #Below are ADMIN views
@@ -440,6 +452,7 @@ def admin_edit_team(request, game_id):
     
     members = [member for member in T_Member.objects.filter(team=team)]
     context['members']=members
+    print(context)
     return render(request, 'admin/edit_team.html', context)
 
 @login_required
