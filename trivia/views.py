@@ -106,6 +106,8 @@ def game_home(request, game_id):
         if team.double_round > 0:
             request.session['double'] = team.double_round
         context = {'game':game, 'rounds':rounds, 'team':team}
+        if Poll.objects.filter(game=game).exists():
+            context['poll'] = Poll.objects.get(game=game)
         return render(request, 'game.html', context)
     else:
         return HttpResponseRedirect(reverse('list'))
@@ -181,6 +183,27 @@ def submit_answers(request, game_id, round_num):
     team.rounds_answered += str(round.round_num)
     team.save()
     return HttpResponseRedirect(reverse('game', args=(game_id,)))
+
+def view_poll(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    poll = Poll.objects.get(game=game)
+    answers = Poll_Answer.objects.filter(poll=poll)
+
+    return render(request, 'view_poll.html', {'game': game, 'poll':poll, 'answers':answers})
+
+def add_vote(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    poll = Poll.objects.get(game=game)
+    answer_id = request.GET['answer_id']
+    answer=Poll_Answer.objects.get(pk=answer_id)
+    answer.votes+=1
+    poll.total_votes += 1
+    poll.save()
+    answer.save()
+    prev_answered = int(request.session.get('poll_votes', 0))
+    request.session['poll_votes'] = prev_answered + 1
+    request.session['a{}'.format(prev_answered+1)]=answer.pk
+    return HttpResponseRedirect(reverse('view_poll', args=(game.password,)))
 
 #Below are ADMIN views
 @login_required

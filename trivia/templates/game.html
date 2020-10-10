@@ -16,6 +16,11 @@
 				<div class='col-3'>
 					<a href="{%url 'edit_team' %}" class="btn btn-outline-info">Edit Team</a>
 				</div>
+				{% if poll %}
+					<div class="col-3">
+						<a href="{%url 'view_poll' game.password %}" class="btn btn-info">View Poll</a>
+					</div>
+				{%endif%}
 			</div>
 		</div>
 

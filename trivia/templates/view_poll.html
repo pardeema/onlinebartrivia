@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{%load mathfilters %}
+
+{% block home_nav %}
+	  <li class="nav-item active">
+        <a class="nav-link" href="{% url 'game_details' game.password %}">Game Home <span class="sr-only">(current)</span></a>
+      </li>
+{% endblock home_nav %}
+{% block content %}
+        {% if error %}
+        <div class="alert alert-dismissible alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Error!</h4>
+            <p class="mb-0">{{error}}</p>
+        </div>
+        {%endif%}
+        {%if alert %}
+        <div class="alert alert-dismissible alert-primary">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Success!</h4>
+            <p class="mb-0">{{alert}}</p>
+        </div>
+        {%endif%}
+
+<div class="card border-info mb-3">
+	<div class="card-header">
+		<h1>View Poll for Game: <u>{{game.password}}</u></h1>
+	</div>
+	<div class="card-body">
+		<h4 class="card-title"><u>Question:</u>  {{poll.question}}</h4>
+			<div class="row">
+				<div class="col-6">
+					<div class="row">
+						<div class="col-3">
+							<a href="{% url 'game' game.password %}" class="btn btn-primary">Back to Game</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-3">
+				</div>
+				<div class="col-3">
+				</div>
+			</div>
+			<div class="card border-info " >
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item">
+						<div class='row'>
+							<div class='col-6'>
+								<h4><b><u>Team</u></b></h4>
+							</div>
+							<div class='col-6'>
+							</div>
+						</div>
+					</li>
+			{% for answer in answers %}
+
+					<li class="list-group-item">
+						<div class='row'>	
+							<div class='col-6'>
+								<h5>{{answer.answer}}</h5>
+							</div>
+							<div class='col-6'>
+								{% if request.session.a1 == answer.pk or request.session.a2 == answer.pk or request.session.a3 == answer.pk %}
+								<a href="#" class="btn btn-primary btn-block disabled">Voted</a>
+								{%elif request.session.poll_votes >= 3 %}
+								<a href="#" class="btn btn-outline-info btn-block disabled">Vote</a>
+								{%else%}
+								<a href="{%url 'add_vote' game.password%}?answer_id={{answer.pk}}" class="btn btn-info btn-block">Vote</a>
+								{%endif%}
+							</div>
+						</div>
+						<div class='row'>
+							<div class="col-6">
+								<div class="progress">
+									{%if poll.total_votes == 0 %}
+										<div class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0</div>
+									{%else%}
+										{%with num=answer.votes|div:poll.total_votes|mul:100|floatformat:'0' %}
+											<div class="progress-bar bg-info" role="progressbar" style="width: {{num}}%" aria-valuenow="{{num}}" aria-valuemin="0" aria-valuemax="100">{{answer.votes}}</div>
+										{%endwith%}
+									{%endif%}
+								</div>
+							</div>
+						</div>
+					</li>
+			{%endfor%}
+
+				</ul>
+			</div>
+			<br>
+
+	</div>
+</div>
+
+{% endblock content %}
