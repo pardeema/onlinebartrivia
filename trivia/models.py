@@ -73,3 +73,22 @@ class T_Answer(models.Model):
         return "{} answer for Q {}, Round {}, Game {}, answer {}".format(self.team.name, 
             self.question.question_num, self.question.round.round_num, 
             self.question.round.game.password, self.answer)
+
+class Poll(models.Model):
+    DEFAULT_POLL_Q = "Vote for your favorite team names (up to 3)"
+    game = models.ForeignKey(Game, on_delete = models.CASCADE)
+    question = models.CharField(default=DEFAULT_POLL_Q, max_length=140)
+    total_votes = models.IntegerField(default=0)
+    def __str__(self):
+        return "Game {}: {}".format(self.game.password, self.question)
+
+class Poll_Answer(models.Model):
+    poll = models.ForeignKey(Poll, on_delete = models.CASCADE)
+    answer = models.CharField(max_length=140)
+    votes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return "Team: {} Game: {}".format(self.answer, self.poll.game.password)
+
+    class Meta:
+        ordering = ['answer']

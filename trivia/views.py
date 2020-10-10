@@ -418,6 +418,9 @@ def admin_view_teams(request, game_id):
     game = get_object_or_404(Game, password=game_id)
     teams = Team.objects.filter(game=game)
     context = {"teams": teams, 'game':game}
+    
+    if Poll.objects.filter(game=game).exists():
+        context['poll'] = Poll.objects.get(game=game)
 
     return render(request, "admin/view_teams.html", context)
 
@@ -493,3 +496,51 @@ def export_teams(request, game_id):
 
     return response
 
+@login_required
+@permission_required('is_superuser')
+def create_poll(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    teams = Team.objects.filter(game=game)
+    context = {"teams": teams, 'game':game}
+    if Poll.objects.filter(game=game).exists():
+        context['error'] = 'Poll already exists!'
+    else:
+        poll = Poll(game=game)
+        poll.save()
+        for team in teams:
+            poll_answer = Poll_Answer(poll=poll, answer=team.name)
+            poll_answer.save()
+        context['alert']='Poll created succesfully!'
+    context['poll'] = Poll.objects.get(game=game)
+    return render(request, 'admin/view_teams.html', context)
+
+@login_required
+@permission_required('is_superuser')
+def delete_poll(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    pid = request.GET['pid']
+    poll = Poll.objects.get(pk=pid)
+    poll.delete()
+    return HttpResponseRedirect(reverse('admin_view_teams', args=(game.password,)))
+
+@login_required
+@permission_required('is_superuser')
+def admin_view_poll(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    poll = Poll.objects.get(game=game)
+    answers = Poll_Answer.objects.filter(poll=poll)
+
+    return render(request, 'admin/view_poll.html', {'game': game, 'poll':poll, 'answers':answers})
+
+@login_required
+@permission_required('is_superuser')
+def admin_add_vote(request, game_id):
+    game = get_object_or_404(Game, password=game_id)
+    poll = Poll.objects.get(game=game)
+    answer_id = request.GET['answer_id']
+    answer=Poll_Answer.objects.get(pk=answer_id)
+    answer.votes+=1
+    poll.total_votes += 1
+    poll.save()
+    answer.save()
+    return HttpResponseRedirect(reverse('admin_view_poll', args=(game.password,)))
