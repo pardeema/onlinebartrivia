@@ -60,7 +60,9 @@
 								<h5>{{answer.answer}}</h5>
 							</div>
 							<div class='col-6'>
-								{% if request.session.a1 == answer.pk or request.session.a2 == answer.pk or request.session.a3 == answer.pk %}
+								{%if request.session.team_name == answer.answer %}
+								<a href="#" class="btn btn-outline-info btn-block disabled">Vote</a>
+								{% elif request.session.a1 == answer.pk or request.session.a2 == answer.pk or request.session.a3 == answer.pk %}
 								<a href="#" class="btn btn-primary btn-block disabled">Voted</a>
 								{%elif request.session.poll_votes >= 3 %}
 								<a href="#" class="btn btn-outline-info btn-block disabled">Vote</a>
