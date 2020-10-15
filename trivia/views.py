@@ -162,6 +162,7 @@ def submit_answers(request, game_id, round_num):
     questions = Question.objects.filter(round = round)
     team = Team.objects.get(name =request.session.get('team_name'), game=game )
     submitted = False
+    previously_doubled = True
     if team.double_round == 0:
         previously_doubled = False
     for question in questions:
