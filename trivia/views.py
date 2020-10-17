@@ -77,8 +77,9 @@ def register_team(request):
     else:
         return render(request, 'register_team.html')
 
-def edit_team(request):
-    team = get_object_or_404(Team, name=request.session['team_name'])
+def edit_team(request, game_id):
+    game = get_object_or_404(Game, password = game_id)
+    team = get_object_or_404(Team, name=request.session['team_name'], game=game)
     context={"team":team}
     if request.method == "POST":
         #update team info
