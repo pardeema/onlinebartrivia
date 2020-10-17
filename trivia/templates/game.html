@@ -14,7 +14,7 @@
 			<h4>Your current score: <b>{{team.score.normalize}}</b></h4>
 			<div class="row">
 				<div class='col-3'>
-					<a href="{%url 'edit_team' %}" class="btn btn-outline-info">Edit Team</a>
+					<a href="{%url 'edit_team' game.password %}" class="btn btn-outline-info">Edit Team</a>
 				</div>
 				{% if poll %}
 					<div class="col-3">
