@@ -61,13 +61,13 @@
                                 <th>Answer Key</th>
                                 <th>{{a.team.name}} Answer</th>
                                 <th>Correct?</th>
-                                <th>Update Points</th>
+                                <th>Update Number Correct</th>
                             </tr>
                             <tr class="table-secondary">
                                 <td class="center">{{a.question.answer}}</td> 
                                 <td class="center">{{a.answer}}</td>
                                 <td class="center"><input type="checkbox" id="check{{a.question.question_num}}" name="a{{a.question.question_num}}_correct" {%if a.correct %}checked {%endif%}></td>
-                                <td class="center"><input type="text" name="a{{a.question.question_num}}" id="points{{a.question.question_num}}" value="{{a.points.normalize}}" size=2></td>
+                                <td class="center"><input type="text" name="a{{a.question.question_num}}" id="points{{a.question.question_num}}" value="{{a.points.normalize}}" size=2 onclick="this.select();"></td>
                             </tr>
                         {%endif%}
                     {%endfor%}

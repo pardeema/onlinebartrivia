@@ -457,7 +457,7 @@ def delete_team(request, game_id):
     Team.objects.get(pk=request.GET['team_id']).delete()
     context = {"teams": teams, 'game':game, 'alert':"Team deleted successfully"}
 
-    return render(request, "admin/view_teams.html", context)
+    return HttpResponseRedirect(reverse('admin_view_teams', args=(game.password,)))
 
 @login_required
 @permission_required('is_superuser')
