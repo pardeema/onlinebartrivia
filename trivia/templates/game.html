@@ -38,7 +38,7 @@
 										<span class="badge badge-secondary badge-pill">Inactive</span>
 									{%endif %}
 								</li>
-								{%if round.active  or round.round_num <= request.session.answered %}
+								{%if round.active  or value|stringformat:round.round_num in team.rounds_answered %}
 									<li class="list-group-item"><b>Round Name: </b> {{round.round_name}}</li>
 									<li class="list-group-item"><a href="{%url 'round' game.password round.round_num %}"><button class="btn {%if round.active %} btn-primary {%else %} btn-outline-primary {%endif%}btn-block">View</button></a></li>
 								{%endif%}
