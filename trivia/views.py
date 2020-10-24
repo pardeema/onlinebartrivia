@@ -2,8 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.mail import send_mail
 from .models import *
 import csv
+from html2text import html2text
 
 def index(request):
     request.session.set_expiry(21600)
@@ -68,6 +70,8 @@ def register_team(request):
         request.session.set_expiry(21600)
         request.session['game_id'] = game_id
         request.session['team_name'] = team_name
+        #Send registration email
+        send_registration_email(team, members)
         return render(request, 'register_success.html', {'team': team, 'members':members})
         
     elif request.GET.get('game_id', False):
@@ -76,6 +80,45 @@ def register_team(request):
         return render(request, 'register_team.html', {"game": game})
     else:
         return render(request, 'register_team.html')
+
+def send_registration_email(team, members):
+    recipients=[]
+
+    subject="Trivia Registration Successful! Game: {}".format(team.game.date)
+    html_message="Congrats!<br><br>"
+    html_message+="Your team <b>{}</b> has been registered for trivia night on <b>{}</b><br><br>".format(team.name, team.game.date)
+    html_message+="<b>Details:</b><br>"
+    html_message+="<ul><li><i>Team:</i> {}\n</li>".format(team.name)
+    html_message+="<li><i>Team Access Code:</i> {}</ul>\n".format(team.password)
+    html_message+="<li><i><u>Game Details:</u></i>"
+    html_message+="		<ul>"
+    html_message+="			<li><i>Date:</i> {}</li>".format(team.game.date)
+    if team.game.meeting_link:
+        html_message+="			<li><i>Meeting Link:</i> <a href='{}'>{}</a></li>".format(team.game.meeting_link, team.game.meeting_link)
+    if team.game.meeting_details:
+        html_message+="			<li><i>Meeting Details:</i> {}</li>".format(team.game.meeting_details)
+    html_message+="		</ul>"
+    html_message+="</li>"
+    html_message+="</ul>"
+    html_message+="<br>The following members are signed up to play:<br><br>"
+    html_message+="<table>"
+    html_message+="	<tr>"
+    html_message+="		<th>Member Name</th>"
+    html_message+="		<th>Member Email</th>"
+    html_message+="	</tr>"
+    for member in members:
+        if member.email:
+            html_message+="	<tr><td>{}</td><td>{}</td></tr>".format(member.name,member.email)
+            recipients.append(member.email)
+    
+    html_message+="</table>"
+    message = html2text(html_message)
+    send_mail(subject=subject, 
+                message=message, 
+                from_email="Online Bar Trivia <no-reply@onlinebartrivia.com>", 
+                recipient_list=recipients, 
+                html_message=html_message)
+
 
 def edit_team(request, game_id):
     game = get_object_or_404(Game, password = game_id)
