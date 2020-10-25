@@ -226,6 +226,7 @@ def submit_answers(request, game_id, round_num):
 
         
     team.rounds_answered += str(round.round_num)
+    team.last_answered = round.round_num
     team.save()
     return HttpResponseRedirect(reverse('game', args=(game_id,)))
 

@@ -47,6 +47,7 @@ class Team(models.Model):
     double_round = models.IntegerField(default=0)
     password = models.CharField(max_length=140, blank=False)
     rounds_answered = models.CharField(max_length=20, blank=True)
+    last_answered = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['game', 'name', 'score']
