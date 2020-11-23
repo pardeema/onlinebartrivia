@@ -10,7 +10,6 @@ urlpatterns = [
     path('game/<str:game_id>/edit_team/', views.edit_team, name='edit_team'),
     path('game/<str:game_id>/', views.game_home, name='game'),
     path('game/<str:game_id>/round/<int:round_num>/', views.round, name='round'),
-    path('game/<str:game_id>/set_team', views.set_team, name='set_team'),
     path('game/<str:game_id>/round/<int:round_num>/submit', views.submit_answers, name='submit_answers'),
     path('game/<str:game_id>/view_poll', views.view_poll, name='view_poll'),
     path('game/<str:game_id>/add_vote', views.add_vote, name='add_vote'),
