@@ -54,10 +54,13 @@ def register_team(request):
         team_pass = request.POST['team_pass'].strip()
         game_id = request.POST['game_id'].strip()
         game = get_object_or_404(Game, password=game_id)
-        if Team.objects.filter(game__password=game_id, name=team_name).exists():
-                return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another", "game": game})
-        team = Team(game=game, name=team_name, password=team_pass)
-        team.save()
+        if game.registration_active:
+            if Team.objects.filter(game__password=game_id, name=team_name).exists():
+                    return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another", "game": game})
+            team = Team(game=game, name=team_name, password=team_pass)
+            team.save()
+        else:
+            return render(request, 'register_team.html', {'game':game})
 
         members=[]
         for i in range(int(request.POST['member_nums'])):
@@ -155,28 +158,6 @@ def game_home(request, game_id):
         return render(request, 'game.html', context)
     else:
         return HttpResponseRedirect(reverse('list'))
-
-def set_team(request, game_id):
-    game = get_object_or_404(Game, password = game_id)
-
-    #If team name has already been set, redirect to game homepage
-    if request.session.get('team_name', False):
-        return HttpResponseRedirect(reverse('game', args=(game.password,)))
-    elif request.method == 'POST':
-        submitted = request.POST['team_name']
-        
-        if submitted != "Viewer":
-            #Uniqueness of team name per game
-            if Team.objects.filter(game=game, name=submitted).exists():
-                return render(request, 'register_team.html', {"error":"Team Name in Use. Choose another"})
-            team = Team(name = submitted, game=game)
-            team.save()
-
-        request.session.set_expiry(21600)
-        request.session['team_name'] = submitted
-        return HttpResponseRedirect(reverse('game', args=(game.password,)))
-    else:
-        return render(request, 'register_team.html')
         
 def round(request, game_id, round_num):
     game = get_object_or_404(Game, password=game_id)
